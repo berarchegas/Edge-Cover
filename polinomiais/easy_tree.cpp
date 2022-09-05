@@ -12,15 +12,6 @@ void dfs(int node) {
         dp[node][0] += dp[x][1];
     }
     
-    // calc dp[node][0]
-    for (auto x : path[node]) {
-        int tenta = dp[node][0] + 1;
-        for (int y : x) {
-            tenta += dp[y][0] - dp[y][1];
-        }
-        dp[node][0] = min(dp[node][0], tenta);
-    }
-    
     // calc dp[node][1]
     dp[node][1] = dp[node][0] + 1;
     for (auto x : par_path[node]) {
