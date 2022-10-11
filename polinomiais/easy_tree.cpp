@@ -15,6 +15,7 @@ void dfs(int node) {
     // calc dp[node][1]
     dp[node][1] = dp[node][0] + 1;
     for (auto x : par_path[node]) {
+        // aqui deveria ser tenta = dp[node][0] + 1?
         int tenta = dp[node][1] + 1;
         for (int y : x) {
             tenta += dp[y][0] - dp[y][1];
