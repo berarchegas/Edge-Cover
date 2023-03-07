@@ -11,7 +11,7 @@ vector<pii> edges;
 
 void path_find(int node, int pai = 0) {
 	aux.push_back(node);
-	if (aux.size() > 2) paths.push_back(aux);
+	if (aux.size() > 4) paths.push_back(aux);
 	for (int x : v[node]) {
 		if (x != pai) {
 			path_find(x, node);
@@ -68,7 +68,7 @@ int main () {
 	random_shuffle(paths.begin(), paths.end());
 	int p;
 	if (paths.empty()) p = 0;
-	else p = rng() % (int)paths.size() + 1;
+	else p = rng() % min((int)paths.size(), n) + 1;
 	cout << n << ' ' << n - 1 << ' ' << p << '\n';
 	for (auto x : edges) cout << x.first << ' ' << x.second << '\n';
 	for (int i = 0; i < p; i++) {

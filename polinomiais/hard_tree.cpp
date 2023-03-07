@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int MAXN = 505;
+const int MAXN = 5e3 + 5;
 
 template<typename T = int> struct hungarian {
 	int n;
@@ -188,10 +188,20 @@ void calcDP(int node, int pai = 0) {
     }
 }
 
+// timer T; T() -> retorna o tempo em ms desde que declarou
+using namespace chrono;
+struct timer : high_resolution_clock {
+	const time_point start;
+	timer(): start(now()) {}
+	int operator()() {
+		return duration_cast<milliseconds>(now() - start).count();
+	}
+};
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(0);
-
+    // timer T;
     int n, m, p, a, b;
     cin >> n >> m >> p;
     for (int i = 0; i < m; i++) {
@@ -206,17 +216,17 @@ int main() {
         cin >> tam;        
         vector<int> path(tam);
         bool cima = false, baixo = false;
-        for (int i = 0; i < tam; i++) {
-            cin >> path[i];
-            if (i && dep[path[i - 1]] > dep[path[i]]) cima = true;
-            if (i && dep[path[i - 1]] < dep[path[i]]) baixo = true;
+        for (int j = 0; j < tam; j++) {
+            cin >> path[j];
+            if (j && dep[path[j - 1]] > dep[path[j]]) cima = true;
+            if (j && dep[path[j - 1]] < dep[path[j]]) baixo = true;
         }
         if (cima && baixo) {
 
             // sobedesce
-            for (int i = 0; i < tam - 2; i++) {
-                if (dep[path[i]] > dep[path[i + 1]] && dep[path[i + 1]] < dep[path[i + 2]]) {
-                    sobedesce[path[i]][path[i + 2]].push_back(path);
+            for (int j = 0; j < tam - 2; j++) {
+                if (dep[path[j]] > dep[path[j + 1]] && dep[path[j + 1]] < dep[path[j + 2]]) {
+                    sobedesce[path[j]][path[j + 2]].push_back(path);
                 }
             }
         }
@@ -235,5 +245,6 @@ int main() {
     calcDP(1);
     
     cout << dp0[1] << '\n';
+    // cout << T() << '\n';
     return 0;
 }

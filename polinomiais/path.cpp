@@ -1,13 +1,25 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int MAXN = 2e5 + 5;
+const int MAXN = 1e6 + 5;
 
+// O(n + |P|)
 int dir[MAXN], esq[MAXN], ansd[MAXN], anse[MAXN];
 vector<int> pathd[MAXN], pathe[MAXN];
+
+// timer T; T() -> retorna o tempo em ms desde que declarou
+using namespace chrono;
+struct timer : high_resolution_clock {
+	const time_point start;
+	timer(): start(now()) {}
+	int operator()() {
+		return duration_cast<milliseconds>(now() - start).count();
+	}
+};
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(0);
+    // timer T;
     int n, m, p, a, b;
     cin >> n >> m >> p;
     for (int i = 0; i < m; i++) {
@@ -37,5 +49,6 @@ int main() {
         for (int x : pathe[i]) anse[i] = min(anse[i], 1 + anse[x]);
     }
     cout << ansd[1] + anse[n] << '\n';
+    // cout << T() << '\n';
     return 0;
 }

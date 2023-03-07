@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 mt19937 rng((int) chrono::steady_clock::now().time_since_epoch().count());
-const int MAXN = 1e5 + 5;
+const int MAXN = 1e6 + 5;
 
 bool dir[MAXN], esq[MAXN];
 vector<vector<int>> paths;
