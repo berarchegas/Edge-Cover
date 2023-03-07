@@ -1,14 +1,10 @@
 // BFS no Branch and Bound
 // Checar se estamos em um caso base (floresta)
 // Se sim, resolvemos com os algoritmos polinomiais
-// Se nao, calculamos o lowerBound com fluxo e podamos se necessario
+// Se nao, calculamos o lowerBound baseado no caminho euleriano
 // Entao pegamos todos os caminhos disponiveis
 // Tiramos as arestas desse caminho e verificamos se o grafo resultante ja foi visitado
 // Baseado nisso marcamos o vis e colocamos na queue, continuando a BFS
-
-// Modelagem com fluxo para o lowerbound esta errada (ela da menos que o lowerbound de vez em quando)
-// Erro no solve da struct tree
-// Acho que eh pq os caminhos estao usando vertices 0-indexados
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -20,7 +16,7 @@ const int MAXN = 1e3 + 5;
 int upperBound = 1e6 + 5;
 ll hasher[MAXN][MAXN];
 map<ll, bool> vis;
-vector<vector<int>> paths;
+vector<vector<int>> paths, paths_1;
 
 struct graph {
     int hashing, n, cost;
@@ -33,63 +29,64 @@ struct graph {
     }
 };
 
+// NAO ESTAMOS USANDO O DINIC
 // Dinic
 //
 // O(min(m * max_flow, n^2 m))
 // Grafo com capacidades 1 -> O(sqrt(n)*m)
 // INF ta pra int
-struct dinic {
-	const bool scaling = false;
-	int lim;
-	struct edge {
-		int to, cap, rev, flow;
-		bool res;
-		edge(int to_, int cap_, int rev_, bool res_)
-			: to(to_), cap(cap_), rev(rev_), flow(0), res(res_) {}
-	};
+// struct dinic {
+// 	const bool scaling = false;
+// 	int lim;
+// 	struct edge {
+// 		int to, cap, rev, flow;
+// 		bool res;
+// 		edge(int to_, int cap_, int rev_, bool res_)
+// 			: to(to_), cap(cap_), rev(rev_), flow(0), res(res_) {}
+// 	};
 
-	vector<vector<edge>> g;
-	vector<int> lev, beg;
-	ll F;
-	dinic(int n) : g(n), F(0) {}
+// 	vector<vector<edge>> g;
+// 	vector<int> lev, beg;
+// 	ll F;
+// 	dinic(int n) : g(n), F(0) {}
 
-	void add(int a, int b, int c) {
-		g[a].emplace_back(b, c, g[b].size(), false);
-		g[b].emplace_back(a, 0, g[a].size()-1, true);
-	}
-	bool bfs(int s, int t) {
-		lev = vector<int>(g.size(), -1); lev[s] = 0;
-		beg = vector<int>(g.size(), 0);
-		queue<int> q; q.push(s);
-		while (q.size()) {
-			int u = q.front(); q.pop();
-			for (auto& i : g[u]) {
-				if (lev[i.to] != -1 or (i.flow == i.cap)) continue;
-				if (scaling and i.cap - i.flow < lim) continue;
-				lev[i.to] = lev[u] + 1;
-				q.push(i.to);
-			}
-		}
-		return lev[t] != -1;
-	}
-	int dfs(int v, int s, int f = INF) {
-		if (!f or v == s) return f;
-		for (int& i = beg[v]; i < g[v].size(); i++) {
-			auto& e = g[v][i];
-			if (lev[e.to] != lev[v] + 1) continue;
-			int foi = dfs(e.to, s, min(f, e.cap - e.flow));
-			if (!foi) continue;
-			e.flow += foi, g[e.to][e.rev].flow -= foi;
-			return foi;
-		}
-		return 0;
-	}
-	ll max_flow(int s, int t) {
-		for (lim = scaling ? (1<<30) : 1; lim; lim /= 2)
-			while (bfs(s, t)) while (int ff = dfs(s, t)) F += ff;
-		return F;
-	}
-};
+// 	void add(int a, int b, int c) {
+// 		g[a].emplace_back(b, c, g[b].size(), false);
+// 		g[b].emplace_back(a, 0, g[a].size()-1, true);
+// 	}
+// 	bool bfs(int s, int t) {
+// 		lev = vector<int>(g.size(), -1); lev[s] = 0;
+// 		beg = vector<int>(g.size(), 0);
+// 		queue<int> q; q.push(s);
+// 		while (q.size()) {
+// 			int u = q.front(); q.pop();
+// 			for (auto& i : g[u]) {
+// 				if (lev[i.to] != -1 or (i.flow == i.cap)) continue;
+// 				if (scaling and i.cap - i.flow < lim) continue;
+// 				lev[i.to] = lev[u] + 1;
+// 				q.push(i.to);
+// 			}
+// 		}
+// 		return lev[t] != -1;
+// 	}
+// 	int dfs(int v, int s, int f = INF) {
+// 		if (!f or v == s) return f;
+// 		for (int& i = beg[v]; i < g[v].size(); i++) {
+// 			auto& e = g[v][i];
+// 			if (lev[e.to] != lev[v] + 1) continue;
+// 			int foi = dfs(e.to, s, min(f, e.cap - e.flow));
+// 			if (!foi) continue;
+// 			e.flow += foi, g[e.to][e.rev].flow -= foi;
+// 			return foi;
+// 		}
+// 		return 0;
+// 	}
+// 	ll max_flow(int s, int t) {
+// 		for (lim = scaling ? (1<<30) : 1; lim; lim /= 2)
+// 			while (bfs(s, t)) while (int ff = dfs(s, t)) F += ff;
+// 		return F;
+// 	}
+// };
 
 template<typename T = int> struct hungarian {
 	int n;
@@ -194,31 +191,31 @@ struct tree {
             if (!vis[i]) dfs(i);
         }
         for (int x : grafo.availablePaths) {
-            int tam = paths[x].size();
+            int tam = paths_1[x].size();
             bool cima = false, baixo = false;
             for (int j = 1; j < tam; j++) {
-                if (dep[paths[x][j - 1]] > dep[paths[x][j]]) cima = true;
-                if (dep[paths[x][j - 1]] < dep[paths[x][j]]) baixo = true;
+                if (dep[paths_1[x][j - 1]] > dep[paths_1[x][j]]) cima = true;
+                if (dep[paths_1[x][j - 1]] < dep[paths_1[x][j]]) baixo = true;
             }
             if (cima && baixo) {
 
                 // sobedesce
                 for (int j = 0; j < tam - 2; j++) {
-                    if (dep[paths[x][j]] > dep[paths[x][j + 1]] && 
-                        dep[paths[x][j + 1]] < dep[paths[x][j + 2]]) {
-                            sobedesce[paths[x][j]][paths[x][j + 2]].push_back(paths[x]);
+                    if (dep[paths_1[x][j]] > dep[paths_1[x][j + 1]] && 
+                        dep[paths_1[x][j + 1]] < dep[paths_1[x][j + 2]]) {
+                            sobedesce[paths_1[x][j]][paths_1[x][j + 2]].push_back(paths_1[x]);
                     }
                 }
             }
             else if (cima) {
 
                 // sobe
-                sobe[paths[x][tam - 2]].push_back(paths[x]);
+                sobe[paths_1[x][tam - 2]].push_back(paths_1[x]);
             }
             else if (baixo) {
                 
                 // desce
-                desce[paths[x][1]].push_back(paths[x]);
+                desce[paths_1[x][1]].push_back(paths_1[x]);
             }
         }
         vis = vector<int> (n);
@@ -356,29 +353,67 @@ struct tree {
     }
 };
 
-int lowerBound(graph &g) {
-    int at = 0;
-    map<pair<int, int>, int> edgesId;
+int lowerBoundEuler(graph &g) {
+    vector<int> vis(g.n);
+    int ans = 0;
     for (int i = 0; i < g.n; i++) {
-        for (int j = 0; j < g.n; j++) {
-            if (g.adjacency[i][j]) edgesId[{i, j}] = at++;
-        }
-    }
-    dinic matching(2 * at + 2);
-    for (int i = 0; i < g.n; i++) {
-        for (int j = 0; j < g.n; j++) {
-            for (int k = 0; k < g.n; k++) {
-                if (g.adjacency[i][j] && g.adjacency[j][k]) {
-                    matching.add(edgesId[{i, j}], at + edgesId[{j, k}], 1);
+        if (!vis[i]) {
+            int qtd = 0;
+            vis[i] = 1;
+            queue<int> fila;
+            fila.push(i);
+            while (!fila.empty()) {
+                int at = fila.front();
+                fila.pop();
+                int dif = 0;
+                for (int j = 0; j < g.n; j++) {
+                    if (g.adjacency[at][j]) {
+                        dif++;
+                        if (!vis[j]) {
+                            vis[j] = 1;
+                            fila.push(j);
+                        }
+                    }
+                    else if (g.adjacency[j][at]) {
+                        dif--;
+                        if (!vis[j]) {
+                            vis[j] = 1;
+                            fila.push(j);
+                        }
+                    }
                 }
+                qtd += max(0, dif);
             }
+            ans += max(1, qtd);
         }
     }
-    int source = 2 * at, sink = 2 * at + 1;
-    for (int i = 0; i < at; i++) matching.add(source, i, 1);
-    for (int i = at; i < 2 * at; i++) matching.add(i, sink, 1);
-    return at - matching.max_flow(source, sink);
+    return ans;
 }
+
+// NAO ESTAMOS USANDO O LOWERBOUNDFLOW
+// int lowerBoundFlow(graph &g) {
+//     int at = 0;
+//     map<pair<int, int>, int> edgesId;
+//     for (int i = 0; i < g.n; i++) {
+//         for (int j = 0; j < g.n; j++) {
+//             if (g.adjacency[i][j]) edgesId[{i, j}] = at++;
+//         }
+//     }
+//     dinic matching(2 * at + 2);
+//     for (int i = 0; i < g.n; i++) {
+//         for (int j = 0; j < g.n; j++) {
+//             for (int k = 0; k < g.n; k++) {
+//                 if (g.adjacency[i][j] && g.adjacency[j][k]) {
+//                     matching.add(edgesId[{i, j}], at + edgesId[{j, k}], 1);
+//                 }
+//             }
+//         }
+//     }
+//     int source = 2 * at, sink = 2 * at + 1;
+//     for (int i = 0; i < at; i++) matching.add(source, i, 1);
+//     for (int i = at; i < 2 * at; i++) matching.add(i, sink, 1);
+//     return at - matching.max_flow(source, sink);
+// }
 
 // NAO ESTAMOS USANDO O getHash
 // ll getHash(graph &g) {
@@ -436,7 +471,7 @@ void bfs(graph &g) {
             tree floresta(at);
             upperBound = min(upperBound, at.cost + floresta.solve());
         }
-        else if (lowerBound(at) < upperBound) {
+        else if (lowerBoundEuler(at) < upperBound) {
             for (int x : at.availablePaths) {
                 graph nat = at;
                 nat.cost++;
@@ -461,9 +496,20 @@ void bfs(graph &g) {
     }
 }
 
+// timer T; T() -> retorna o tempo em ms desde que declarou
+using namespace chrono;
+struct timer : high_resolution_clock {
+    const time_point start;
+    timer(): start(now()) {}
+    int operator()() {
+        return duration_cast<milliseconds>(now() - start).count();
+    }
+};
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(0);
+    timer T;
     int n, m, p, a, b;
     cin >> n >> m >> p;
     for (int i = 0; i < n; i++) {
@@ -479,6 +525,8 @@ int main() {
         g.hashing ^= hasher[a][b];
         vector<int> path = {a, b};
         paths.push_back(path);
+        path[0]++, path[1]++;
+        paths_1.push_back(path);
         g.availablePaths.insert(i);
     }
     for (int i = 0; i < p; i++) {
@@ -490,12 +538,19 @@ int main() {
             x--;
         }
         paths.push_back(path);
+        for (int &x : path) {
+            x++;
+        }
+        paths_1.push_back(path);
         g.availablePaths.insert(i + m);
     }
-    sort(paths.begin(), paths.end(), [&] (vector<int> a, vector<int> b) {
+    stable_sort(paths.begin(), paths.end(), [&] (vector<int> a, vector<int> b) {
+        return a.size() > b.size();
+    });
+    stable_sort(paths_1.begin(), paths_1.end(), [&] (vector<int> a, vector<int> b) {
         return a.size() > b.size();
     });
     bfs(g);
-    cout << upperBound << endl;
+    cout << upperBound << ' ' << T() << '\n';
     return 0;
 }
