@@ -7,6 +7,8 @@
 // Baseado nisso marcamos o vis e colocamos na queue, continuando a BFS
 
 // Modelagem com fluxo para o lowerbound esta errada (ela da menos que o lowerbound de vez em quando)
+// Erro no solve da struct tree
+// Acho que eh pq os caminhos estao usando vertices 0-indexados
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -194,9 +196,9 @@ struct tree {
         for (int x : grafo.availablePaths) {
             int tam = paths[x].size();
             bool cima = false, baixo = false;
-            for (int j = 0; j < tam; j++) {
-                if (j && dep[paths[x][j - 1]] > dep[paths[x][j]]) cima = true;
-                if (j && dep[paths[x][j - 1]] < dep[paths[x][j]]) baixo = true;
+            for (int j = 1; j < tam; j++) {
+                if (dep[paths[x][j - 1]] > dep[paths[x][j]]) cima = true;
+                if (dep[paths[x][j - 1]] < dep[paths[x][j]]) baixo = true;
             }
             if (cima && baixo) {
 
@@ -426,6 +428,7 @@ void bfs(graph &g) {
     queue<graph> fila;
     fila.push(g);
     vis[g.hashing] = 1;
+    int cnt = 1;
     while (!fila.empty()) {
         graph at = fila.front();
         fila.pop();
