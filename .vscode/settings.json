@@ -5,6 +5,8 @@
         "deque": "cpp",
         "string": "cpp",
         "vector": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp"
     }
 }
