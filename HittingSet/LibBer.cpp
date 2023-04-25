@@ -3,6 +3,7 @@ using namespace std;
 using pii = pair<int, int>;
 
 // Maybe i am removing a node more than once and then rollback doesnt work properly
+// I am creating a lot of auxiliar Nodes* and maybe I can just do a global one?
 
 // Define the node structure for the ordered subset list
 struct Node {
@@ -58,7 +59,8 @@ class OrderedSubsetList {
 
             if (head != nullptr) {
                 head->prev = newNode;
-            } else {
+            } 
+            else {
                 tail = newNode;
             }
 
@@ -80,7 +82,8 @@ class OrderedSubsetList {
 
             if (tail != nullptr) {
                 tail->next = newNode;
-            } else {
+            } 
+            else {
                 head = newNode;
             }
 
@@ -104,7 +107,8 @@ class OrderedSubsetList {
             if (head == tail) {
                 head = nullptr;
                 tail = nullptr;
-            } else {
+            } 
+            else {
                 head = head->next;
                 head->prev = nullptr;
             }
@@ -125,7 +129,8 @@ class OrderedSubsetList {
             if (head == tail) {
                 head = nullptr;
                 tail = nullptr;
-            } else {
+            } 
+            else {
                 tail = tail->prev;
                 tail->next = nullptr;
             }
@@ -171,10 +176,28 @@ class OrderedSubsetList {
             deletedNodes.pop();
 
             if (node->prev == nullptr) {
-                pushFront(node->data);
+                node->next = head;
+
+                if (head != nullptr) {
+                    head->prev = node;
+                } 
+                else {
+                    tail = node;
+                }
+
+                head = node;
             } 
             else if (node->next == nullptr) {
-                pushBack(node->data);
+                node->prev = tail;
+
+                if (tail != nullptr) {
+                    tail->next = node;
+                } 
+                else {
+                    head = node;
+                }
+
+                tail = node;
             } 
             else {
                 node->prev->next = node;
@@ -211,6 +234,7 @@ class OrderedSubsetList {
 
         }
 
+        // Returns all the elements in the list
         vector<int> elements() {
 
             vector<int> ans;
@@ -252,6 +276,7 @@ void printTudo() {
         edges[i].printForward();
     }
     cout << '\n';
+    cout << endl;
 }
 
 // Erase the edge from its vertices
@@ -344,18 +369,18 @@ int calculateUpperbound() {
             int id = bucket[i].back();
             bucket[i].pop_back();
             if (nodeDegree[id] == i) {
-                cout << id << '\n';
                 ans++;
                 takeVertex(id);
             }
             else {
+
                 bucket[nodeDegree[id]].push_back(id);
             }
         }
     }
 
+
     while (operations.size() > initialSize) {
-        printTudo();
         undo();
     }    
 
@@ -400,12 +425,13 @@ int main() {
 
     cout << calculateUpperbound() << '\n';
 
-    printTudo();    
+    ignoreVertex(4);
 
-    eraseEdge(0);
+    printTudo();   
+
     cout << calculateUpperbound() << '\n';
 
-    printTudo();
+    printTudo(); 
 
     return 0;
 }
