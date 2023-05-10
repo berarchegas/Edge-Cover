@@ -4,7 +4,7 @@
 using namespace std;
 using pii = pair<int, int>;
 
-void printAll(int n, int m, OrderedSubsetList *vertices, OrderedSubsetList *edges) {
+void printAll(int n, int m, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges) {
     for (int i = 0; i < n; i++) {
         cout << "Node " << i << " = ";
         vertices[i].printForward();
@@ -19,7 +19,7 @@ void printAll(int n, int m, OrderedSubsetList *vertices, OrderedSubsetList *edge
 }
 
 // Erase the edge from its vertices
-void eraseEdge(int edge, OrderedSubsetList *vertices, OrderedSubsetList *edges, 
+void eraseEdge(int edge, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges, 
     OrderedSubsetList &validEdges, stack<pii> &operations) {
 
     vector<int> list = edges[edge].elements();
@@ -33,9 +33,8 @@ void eraseEdge(int edge, OrderedSubsetList *vertices, OrderedSubsetList *edges,
 }
 
 // Place the vertex in the answer set
-void takeVertex(int node, OrderedSubsetList *vertices, OrderedSubsetList *edges, 
-    bool *valid, OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
-    stack<pii> &operations) {
+void takeVertex(int node, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges, 
+    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges, stack<pii> &operations) {
 
     // Erase it from every edge that contains it
     vector<int> list = vertices[node].elements();
@@ -43,7 +42,6 @@ void takeVertex(int node, OrderedSubsetList *vertices, OrderedSubsetList *edges,
         edges[x].removeNode(node);
     }
 
-    valid[node] = false;
     validVertices.removeNode(node);
     operations.push({1, node});
 
@@ -55,8 +53,8 @@ void takeVertex(int node, OrderedSubsetList *vertices, OrderedSubsetList *edges,
 }
 
 // Fix the node out of the answer
-void ignoreVertex(int node, OrderedSubsetList *vertices, OrderedSubsetList *edges,
-    bool *valid, OrderedSubsetList &validVertices, stack<pii> &operations) {
+void ignoreVertex(int node, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
+    OrderedSubsetList &validVertices, stack<pii> &operations) {
 
     // Erase it from every edge that contains it
     vector<int> list = vertices[node].elements();
@@ -64,15 +62,14 @@ void ignoreVertex(int node, OrderedSubsetList *vertices, OrderedSubsetList *edge
         edges[x].removeNode(node);
     }
 
-    valid[node] = false;
     validVertices.removeNode(node);
     operations.push({1, node});
 
 }
 
 // Undo the last deletion of vertex/edge
-void undo(OrderedSubsetList *vertices, OrderedSubsetList *edges,
-    bool *valid, OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
+void undo(vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
+    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
     stack<pii> &operations, vector<vector<int>> &bucket) {
 
     if (operations.empty()) {
@@ -102,7 +99,6 @@ void undo(OrderedSubsetList *vertices, OrderedSubsetList *edges,
             edges[x].rollback();
         }
 
-        valid[id] = true;
         validVertices.rollback();
         bucket[vertices[id].getSize()].push_back(id);
     }

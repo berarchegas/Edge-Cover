@@ -44,6 +44,9 @@ class OrderedSubsetList {
         // Returns all the elements in the list
         vector<int> elements();
 
+        // Returns a booleanif id is alive
+        bool getState(int pos);
+
         int getSize();
 
     private:

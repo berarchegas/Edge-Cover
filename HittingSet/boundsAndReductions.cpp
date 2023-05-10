@@ -7,8 +7,8 @@ using namespace std;
 using pii = pair<int, int>;
 
 // Calculate the Upperbound
-int calculateUpperbound(int m, OrderedSubsetList *vertices, OrderedSubsetList *edges,
-    bool *valid, vector<vector<int>> &bucket, OrderedSubsetList &validVertices,
+int calculateUpperbound(int m, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
+    vector<vector<int>> &bucket, OrderedSubsetList &validVertices,
     OrderedSubsetList &validEdges, stack<pii> &operations) {
     int ans = 0;
     int initialSize = operations.size();
@@ -17,11 +17,11 @@ int calculateUpperbound(int m, OrderedSubsetList *vertices, OrderedSubsetList *e
         while (!bucket[i].empty()) {
             int id = bucket[i].back();
             bucket[i].pop_back();
-            if (vertices[id].getSize() == i && valid[id]) {
+            if (vertices[id].getSize() == i && validVertices.getState(id)) {
                 ans++;
-                takeVertex(id, vertices, edges, valid, validVertices, validEdges, operations);
+                takeVertex(id, vertices, edges, validVertices, validEdges, operations);
             }
-            else if (valid[id]) {
+            else if (validVertices.getState(id)) {
                 bucket[vertices[id].getSize()].push_back(id);
             }
         }
@@ -29,7 +29,7 @@ int calculateUpperbound(int m, OrderedSubsetList *vertices, OrderedSubsetList *e
 
 
     while (operations.size() > initialSize) {
-        undo(vertices, edges, valid, validVertices, validEdges, operations, bucket);
+        undo(vertices, edges, validVertices, validEdges, operations, bucket);
     }    
 
     bucket[0].clear();
@@ -46,7 +46,7 @@ int ceiling(int a, int b) {
     return a / b + !!(a % b);
 }
 
-int maxDegreeBound(OrderedSubsetList *vertices, OrderedSubsetList &validVertices,
+int maxDegreeBound(vector<OrderedSubsetList> &vertices, OrderedSubsetList &validVertices,
     OrderedSubsetList &validEdges) {
     int maxDegree = 0;
     vector<int> valid = validVertices.elements();
@@ -58,9 +58,10 @@ int maxDegreeBound(OrderedSubsetList *vertices, OrderedSubsetList &validVertices
 }
 
 // returns the lowerBound and calculates for every vertex the new lowerbound if we remove it
-int efficiencyBound(OrderedSubsetList *vertices, OrderedSubsetList *edges,
+int efficiencyBound(vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
     OrderedSubsetList &validEdges, OrderedSubsetList &validVertices,
-    int **maxDegree, int **maxDegreeNode, int *maxLowerBound) {
+    vector<pii> &maxDegree, vector<pii> &maxDegreeNode, 
+    vector<int> &maxLowerBound) {
 
     double ans = 0;
     vector<int> valid = validEdges.elements();
@@ -68,25 +69,25 @@ int efficiencyBound(OrderedSubsetList *vertices, OrderedSubsetList *edges,
     for (int x : valid) {
 
         vector<int> nodes = edges[x].elements();
-        maxDegree[x][0] = maxDegree[x][1] = 0;
-        maxDegreeNode[x][0] = maxDegreeNode[x][1] = -1;
+        maxDegree[x].first = maxDegree[x].second = 0;
+        maxDegreeNode[x].first = maxDegreeNode[x].second = -1;
         
         for (int y : nodes) {
         
-            if (vertices[y].getSize() > maxDegree[x][0]) {
-                maxDegree[x][1] = maxDegree[x][0];
-                maxDegreeNode[x][1] = maxDegreeNode[x][0];
-                maxDegree[x][0] = vertices[y].getSize();
-                maxDegreeNode[x][0] = y;
+            if (vertices[y].getSize() > maxDegree[x].first) {
+                maxDegree[x].second = maxDegree[x].first;
+                maxDegreeNode[x].second = maxDegreeNode[x].first;
+                maxDegree[x].first = vertices[y].getSize();
+                maxDegreeNode[x].first = y;
             }
-            else if (vertices[y].getSize() > maxDegree[x][1]) {
-                maxDegree[x][1] = vertices[y].getSize();
-                maxDegreeNode[x][1] = y;
+            else if (vertices[y].getSize() > maxDegree[x].second) {
+                maxDegree[x].second = vertices[y].getSize();
+                maxDegreeNode[x].second = y;
             }
         
         }
         
-        ans += 1.0 / maxDegree[x][0];
+        ans += 1.0 / maxDegree[x].first;
     }
 
     vector<int> nodes = validVertices.elements();
@@ -96,8 +97,8 @@ int efficiencyBound(OrderedSubsetList *vertices, OrderedSubsetList *edges,
         vector<int> edges = vertices[x].elements();
     
         for (int y : edges) {
-            if (maxDegreeNode[y][0] == x) {
-                bonus += 1.0 / maxDegree[y][1] - 1.0 / maxDegree[y][0];
+            if (maxDegreeNode[y].first == x) {
+                bonus += 1.0 / maxDegree[y].second - 1.0 / maxDegree[y].first;
             }
         }
 
@@ -109,11 +110,13 @@ int efficiencyBound(OrderedSubsetList *vertices, OrderedSubsetList *edges,
     return (int)ceil(ans);
 }
 
-int packingBound(OrderedSubsetList *edges, OrderedSubsetList &validEdges, bool *valid) {
+int packingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges) {
     vector<int> e = validEdges.elements(), packing;
     sort(e.begin(), e.end(), [&] (int a, int b) {
         return edges[a].getSize() > edges[b].getSize();
     });
+
+    vector<bool> valid(n, true);
 
     for (int x : e) {
         bool ok = true;
@@ -130,21 +133,12 @@ int packingBound(OrderedSubsetList *edges, OrderedSubsetList &validEdges, bool *
     
     }
 
-    for (int x : packing) {
-        vector<int> nodes = edges[x].elements();
-
-        for (int y : nodes) {
-            valid[y] = true;
-        } 
-
-    }
-
     return packing.size();
 }
 
-void repacking(OrderedSubsetList *vertices, OrderedSubsetList *edges,
+void repacking(int n, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
     OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
-    bool *valid, stack<pii> &operations, int *maxLowerBound,
+    vector<bool> valid, stack<pii> &operations, vector<int> &maxLowerBound,
     vector<vector<int>> &bucket) {
 
     vector<int> nodes = validVertices.elements();
@@ -171,23 +165,25 @@ void repacking(OrderedSubsetList *vertices, OrderedSubsetList *edges,
     
         if (grau[i].second != -1) {
             int initialSize = operations.size();
-            ignoreVertex(grau[i].second, vertices, edges, valid, validVertices, operations);
-            maxLowerBound[grau[i].second] = max(maxLowerBound[grau[i].second], packingBound(edges, validEdges, valid));
+            ignoreVertex(grau[i].second, vertices, edges, validVertices, operations);
+            maxLowerBound[grau[i].second] = max(maxLowerBound[grau[i].second], packingBound(n, edges, validEdges));
             while (operations.size() > initialSize) 
-                undo(vertices, edges, valid, validVertices, validEdges, operations, bucket);
+                undo(vertices, edges, validVertices, validEdges, operations, bucket);
         }
     
     }
 
 }
 
-void costlyDiscardPackingBound(OrderedSubsetList *edges, OrderedSubsetList &validEdges,
-    OrderedSubsetList &validVertices, bool *valid, vector<vector<int>> &blockedEdges, 
-    int *maxLowerBound) {
+void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges,
+    OrderedSubsetList &validVertices, vector<vector<int>> &blockedEdges, 
+    vector<int> &maxLowerBound) {
     vector<int> e = validEdges.elements(), packing;
     sort(e.begin(), e.end(), [&] (int a, int b) {
         return edges[a].getSize() > edges[b].getSize();
     });
+
+    vector<bool> valid(n, true);
 
     for (int x : e) {
         bool ok = true;
@@ -260,25 +256,17 @@ void costlyDiscardPackingBound(OrderedSubsetList *edges, OrderedSubsetList &vali
 
     }
 
-    for (int x : packing) {
-        vector<int> nodes = edges[x].elements();
-
-        for (int y : nodes) {
-            valid[y] = true;
-        } 
-
-    }
-
 }
 
-int sumOverPackingBound(OrderedSubsetList *vertices, OrderedSubsetList *edges,
-    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges, 
-    bool *valid) {
+int sumOverPackingBound(int n, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
+    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges) {
     vector<int> e = validEdges.elements();
     vector<int> packing;
     sort(e.begin(), e.end(), [&] (int a, int b) {
         return edges[a].getSize() > edges[b].getSize();
     });
+
+    vector<bool> valid(n, true);
 
     for (int x : e) {
         bool ok = true;
@@ -331,22 +319,13 @@ int sumOverPackingBound(OrderedSubsetList *vertices, OrderedSubsetList *edges,
 
     }
 
-    for (int x : packing) {
-        vector<int> nodes = edges[x].elements();
-
-        for (int y : nodes) {
-            valid[y] = true;
-        } 
-
-    }
-
     return ans;
 }
 
 // Returns edges with size <= 1
 // If it has size 1, we pick the corresponding vertex
 // If it has size 0, we delete it (Is it possible to have size 0? )
-vector<int> unitEdgeRule(OrderedSubsetList *edges, OrderedSubsetList &validEdges) {
+vector<int> unitEdgeRule(vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges) {
     vector<int> ans;
 
     vector<int> e = validEdges.elements();
@@ -357,7 +336,7 @@ vector<int> unitEdgeRule(OrderedSubsetList *edges, OrderedSubsetList &validEdges
     return ans;
 }
 
-vector<int> dominatedEdges(int n, OrderedSubsetList *edges, OrderedSubsetList &validEdges) {
+vector<int> dominatedEdges(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges) {
     vector<int> ans;
 
     SetTrie validos;
@@ -375,7 +354,7 @@ vector<int> dominatedEdges(int n, OrderedSubsetList *edges, OrderedSubsetList &v
     return ans;
 }
 
-vector<int> dominatedVertices(int m, OrderedSubsetList *vertices, OrderedSubsetList &validVertices) {
+vector<int> dominatedVertices(int m, vector<OrderedSubsetList> &vertices, OrderedSubsetList &validVertices) {
     vector<int> ans;
 
     SetTrie validos;

@@ -250,6 +250,11 @@ vector<int> OrderedSubsetList::elements() {
     return ans;
 }
 
+// Returns a booleanif id is alive
+bool OrderedSubsetList::getState(int pos) {
+    return alive[pos];
+}
+
 int OrderedSubsetList::getSize() { 
     return size; 
 }

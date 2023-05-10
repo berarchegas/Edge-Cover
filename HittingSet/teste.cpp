@@ -1,22 +1,29 @@
 #include <bits/stdc++.h>
-#include "setTrie.h"
 using namespace std;
 using pii = pair<int, int>;
+using ll = long long;
+
+mt19937_64 rng((ll) chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
+    freopen("in.txt", "w", stdout);
     int n, m;
     cin >> n >> m;
-    SetTrie ber;
-    for (int i = 0; i < n; i++) {
-        vector<bool> oda(m);
-        int tam, x;
-        cin >> tam;
-        for (int j = 0; j < tam; j++) {
-            cin >> x;
-            oda[x] = true;
+    set<vector<int>> st;
+    while (st.size() < m) {
+        ll msk = rng() % (1ll << n);
+        if (__builtin_popcountll(msk) > (n/2 - 5)) continue;
+        vector<int> ans;
+        ans.push_back(__builtin_popcountll(msk));
+        for (int i = 0; i < n; i++) {
+            if (msk & (1ll << i)) ans.push_back(i);
         }
-        cout << ber.subsetSearch(oda) << ' ' << ber.supersetSearch(oda) << endl;
-        ber.insert(oda);
+        st.insert(ans);
+    }
+    cout << n << ' ' << m << '\n';
+    for (vector<int> x : st) {
+        for (int y : x) cout << y << ' ';
+        cout << '\n';
     }
     return 0;
 }
