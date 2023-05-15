@@ -4,17 +4,25 @@
 using namespace std;
 using pii = pair<int, int>;
 
-void printAll(int n, int m, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges) {
-    for (int i = 0; i < n; i++) {
+void printAll(int n, int m, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
+    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges, vector<vector<int>> &bucket) {
+    vector<int> v = validVertices.elements();
+    for (int i : v) {
         cout << "Node " << i << " = ";
         vertices[i].printForward();
     }
     cout << '\n';
-    for (int i = 0; i < m; i++) {
+    vector<int> e = validEdges.elements();
+    for (int i : e) {
         cout << "Edge " << i << " = ";
         edges[i].printForward();
     }
     cout << '\n';
+    for (int i = 0; i <= m; i++) {
+        cout << "Bucket " << i << " = ";
+        for (int x : bucket[i]) cout << x << ' ';
+        cout << '\n';
+    }
     cout << endl;
 }
 
@@ -34,7 +42,8 @@ void eraseEdge(int edge, vector<OrderedSubsetList> &vertices, vector<OrderedSubs
 
 // Place the vertex in the answer set
 void takeVertex(int node, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges, 
-    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges, stack<pii> &operations) {
+    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges, stack<pii> &operations,
+    vector<int> &ans) {
 
     // Erase it from every edge that contains it
     vector<int> list = vertices[node].elements();
@@ -43,6 +52,7 @@ void takeVertex(int node, vector<OrderedSubsetList> &vertices, vector<OrderedSub
     }
 
     validVertices.removeNode(node);
+    // ans.push_back(node);
     operations.push({1, node});
 
     // Erase every edge
@@ -70,7 +80,7 @@ void ignoreVertex(int node, vector<OrderedSubsetList> &vertices, vector<OrderedS
 // Undo the last deletion of vertex/edge
 void undo(vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
     OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
-    stack<pii> &operations, vector<vector<int>> &bucket) {
+    stack<pii> &operations, vector<vector<int>> &bucket, vector<int> &ans) {
 
     if (operations.empty()) {
         return;
@@ -99,8 +109,9 @@ void undo(vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
             edges[x].rollback();
         }
 
+        // ans.pop_back();
         validVertices.rollback();
-        bucket[vertices[id].getSize()].push_back(id);
+        bucket.back().push_back(id);
     }
 
 }

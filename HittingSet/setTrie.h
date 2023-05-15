@@ -6,7 +6,7 @@ using namespace std;
 // Defines the nodes of the Trie Node class
 class TrieNode {
     public:
-        unordered_map<int, TrieNode*> children;
+        map<int, TrieNode*> children;
         bool is_end_of_word;
         int qtd;
 

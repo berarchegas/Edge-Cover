@@ -6,7 +6,8 @@ using namespace std;
 using pii = pair<int, int>;
 
 // Prints the instance
-void printAll(int n, int m, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges);
+void printAll(int n, int m, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
+    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges, vector<vector<int>> &bucket);
 
 // Erase the edge from its vertices
 void eraseEdge(int edge, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges, 
@@ -15,7 +16,7 @@ void eraseEdge(int edge, vector<OrderedSubsetList> &vertices, vector<OrderedSubs
 // Place the vertex in the answer set
 void takeVertex(int node, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges, 
     OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
-    stack<pii> &operations);
+    stack<pii> &operations, vector<int> &ans);
 
 // Fix the node out of the answer
 void ignoreVertex(int node, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
@@ -24,6 +25,6 @@ void ignoreVertex(int node, vector<OrderedSubsetList> &vertices, vector<OrderedS
 // Undo the last deletion of vertex/edge
 void undo(vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
     OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
-    stack<pii> &operations, vector<vector<int>> &bucket);
+    stack<pii> &operations, vector<vector<int>> &bucket, vector<int> &ans);
 
 #endif

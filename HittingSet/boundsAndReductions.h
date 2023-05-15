@@ -8,7 +8,7 @@ using pii = pair<int, int>;
 // Calculate the Upperbound
 int calculateUpperbound(int m, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
     vector<vector<int>> &bucket, OrderedSubsetList &validVertices,
-    OrderedSubsetList &validEdges, stack<pii> &operations);
+    OrderedSubsetList &validEdges, stack<pii> &operations, vector<int> &ans);
 
 // return ceil of a / b
 int ceiling(int a, int b);
@@ -26,8 +26,8 @@ int packingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &val
 
 void repacking(int n, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
     OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
-    vector<bool> valid, stack<pii> &operations, vector<int> &maxLowerBound,
-    vector<vector<int>> &bucket);
+    stack<pii> &operations, vector<int> &maxLowerBound,
+    vector<vector<int>> &bucket, vector<int> &ans);
 
 void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges,
     OrderedSubsetList &validVertices, vector<vector<int>> &blockedEdges, 

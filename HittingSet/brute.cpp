@@ -21,7 +21,7 @@ int main() {
         masks.push_back(mask);
     }
 
-    int ans = n + 1, maskAnswer = -1;
+    ll ans = n + 1, maskAnswer = -1;
     for (ll i = 0; i < (1ll << n); i++) {
         if (__builtin_popcountll(i) >= ans) continue;
         bool ok = true;
