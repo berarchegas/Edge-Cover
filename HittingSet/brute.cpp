@@ -25,7 +25,10 @@ int main() {
     for (ll i = 0; i < (1ll << n); i++) {
         if (__builtin_popcountll(i) >= ans) continue;
         bool ok = true;
-        for (ll x : masks) ok &= !!(x & i);
+        for (ll x : masks) {
+            ok &= !!(x & i);
+            if (!ok) break;
+        }
         if (ok) {
             ans = __builtin_popcountll(i);
             maskAnswer = i;

@@ -106,14 +106,21 @@ int efficiencyBound(vector<OrderedSubsetList> &vertices, vector<OrderedSubsetLis
         
     }
 
-    // dont know if this breaks
     return (int)ceil(ans);
 }
 
-int packingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges) {
+int packingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges,
+    vector<OrderedSubsetList> &vertices, vector<int> &sumOfDegrees) {
+
     vector<int> e = validEdges.elements(), packing;
+    for (int x : e) {
+        sumOfDegrees[x] = 0;
+        vector<int> v = edges[x].elements();
+        for (int y : v) sumOfDegrees[x] += vertices[y].getSize();
+    }
+
     sort(e.begin(), e.end(), [&] (int a, int b) {
-        return edges[a].getSize() > edges[b].getSize();
+        return sumOfDegrees[a] < sumOfDegrees[b];
     });
 
     vector<bool> valid(n, true);
@@ -139,7 +146,7 @@ int packingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &val
 void repacking(int n, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
     OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
     stack<pii> &operations, vector<int> &maxLowerBound,
-    vector<vector<int>> &bucket, vector<int> &ans) {
+    vector<vector<int>> &bucket, vector<int> &ans, vector<int> &sumOfDegrees) {
 
     vector<int> nodes = validVertices.elements();
 
@@ -166,7 +173,8 @@ void repacking(int n, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetL
         if (grau[i].second != -1) {
             int initialSize = operations.size();
             ignoreVertex(grau[i].second, vertices, edges, validVertices, operations);
-            maxLowerBound[grau[i].second] = max(maxLowerBound[grau[i].second], packingBound(n, edges, validEdges));
+            maxLowerBound[grau[i].second] = max(maxLowerBound[grau[i].second], 
+                packingBound(n, edges, validEdges, vertices, sumOfDegrees));
             while (operations.size() > initialSize) 
                 undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
         }
@@ -176,11 +184,18 @@ void repacking(int n, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetL
 }
 
 void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges,
-    OrderedSubsetList &validVertices, vector<vector<int>> &blockedEdges, 
-    vector<int> &maxLowerBound) {
+    vector<OrderedSubsetList> &vertices, OrderedSubsetList &validVertices, 
+    vector<vector<int>> &blockedEdges, vector<int> &maxLowerBound, vector<int> &sumOfDegrees) {
+
     vector<int> e = validEdges.elements(), packing;
+    for (int x : e) {
+        sumOfDegrees[x] = 0;
+        vector<int> v = edges[x].elements();
+        for (int y : v) sumOfDegrees[x] += vertices[y].getSize();
+    }
+
     sort(e.begin(), e.end(), [&] (int a, int b) {
-        return edges[a].getSize() > edges[b].getSize();
+        return sumOfDegrees[a] < sumOfDegrees[b];
     });
 
     vector<bool> valid(n, true);
@@ -211,8 +226,7 @@ void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedS
             }
         }
 
-        // if the edge only has one vertex 
-        // then if we remove this vertex the edge becomes insignificant
+        // if the edge only has one vertex it is in the packing
         if (cnt == 1 && nodes.size() > 1) {
             blockedEdges[block].push_back(x);
         } 
@@ -221,9 +235,10 @@ void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedS
 
     vector<int> nodes = validVertices.elements();
     for (int x : nodes) {
+
         vector<int> extraPacking;
         sort(blockedEdges[x].begin(), blockedEdges[x].end(), [&] (int a, int b) {
-            return edges[a].getSize() > edges[b].getSize();
+            return sumOfDegrees[a] < sumOfDegrees[b];
         });
         
         for (int y : blockedEdges[x]) {
@@ -259,11 +274,17 @@ void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedS
 }
 
 int sumOverPackingBound(int n, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
-    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges) {
-    vector<int> e = validEdges.elements();
-    vector<int> packing;
+    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges, vector<int> &sumOfDegrees) {
+
+    vector<int> e = validEdges.elements(), packing;
+    for (int x : e) {
+        sumOfDegrees[x] = 0;
+        vector<int> v = edges[x].elements();
+        for (int y : v) sumOfDegrees[x] += vertices[y].getSize();
+    }
+
     sort(e.begin(), e.end(), [&] (int a, int b) {
-        return edges[a].getSize() > edges[b].getSize();
+        return sumOfDegrees[a] < sumOfDegrees[b];
     });
 
     vector<bool> valid(n, true);

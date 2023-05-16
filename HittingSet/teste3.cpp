@@ -9,15 +9,19 @@ int main() {
     freopen("in.txt", "w", stdout);
     int n, m;
     cin >> n >> m;
+    vector<vector<int>> v;
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            for (int k = j + 1; k < n; k++) {
+                for (int l = k + 1; l < n; l++)
+                    v.push_back({i, j, k, l});
+            }
+        }
+    }
     set<vector<int>> st;
     while (st.size() < m) {
-        ll msk = rng() % ((1ll << n) - 1) + 1;
-        if (__builtin_popcountll(msk) > 5) continue;
-        vector<int> ans;
-        for (int i = 0; i < n; i++) {
-            if (msk & (1ll << i)) ans.push_back(i);
-        }
-        st.insert(ans);
+        int id = rng() % ((int)v.size());
+        st.insert(v[id]);
     }
     cout << n << ' ' << m << '\n';
     for (vector<int> x : st) {

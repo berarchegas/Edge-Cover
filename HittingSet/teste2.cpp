@@ -11,13 +11,12 @@ int main() {
     cin >> n >> m;
     set<vector<int>> st;
     while (st.size() < m) {
-        ll msk = rng() % ((1ll << n) - 1) + 1;
-        if (__builtin_popcountll(msk) > 5) continue;
-        vector<int> ans;
+        vector<int> v;
         for (int i = 0; i < n; i++) {
-            if (msk & (1ll << i)) ans.push_back(i);
+            if (rng() % 30 == 0) v.push_back(i);
         }
-        st.insert(ans);
+        if (v.empty()) continue;
+        st.insert(v);
     }
     cout << n << ' ' << m << '\n';
     for (vector<int> x : st) {

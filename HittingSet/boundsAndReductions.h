@@ -22,19 +22,20 @@ int efficiencyBound(vector<OrderedSubsetList> &vertices, vector<OrderedSubsetLis
     vector<pii> &maxDegree, vector<pii> &maxDegreeNode, 
     vector<int> &maxLowerBound);
 
-int packingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges);
+int packingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges,
+    vector<OrderedSubsetList> &vertices, vector<int> &sumOfDegrees);
 
 void repacking(int n, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
     OrderedSubsetList &validVertices, OrderedSubsetList &validEdges,
     stack<pii> &operations, vector<int> &maxLowerBound,
-    vector<vector<int>> &bucket, vector<int> &ans);
+    vector<vector<int>> &bucket, vector<int> &ans, vector<int> &sumOfDegrees);
 
 void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedSubsetList &validEdges,
-    OrderedSubsetList &validVertices, vector<vector<int>> &blockedEdges, 
-    vector<int> &maxLowerBound);
+    vector<OrderedSubsetList> &vertices, OrderedSubsetList &validVertices, 
+    vector<vector<int>> &blockedEdges, vector<int> &maxLowerBound, vector<int> &sumOfDegrees);
 
 int sumOverPackingBound(int n, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
-    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges);
+    OrderedSubsetList &validVertices, OrderedSubsetList &validEdges, vector<int> &sumOfDegrees);
 
 // Returns edges with size <= 1
 // If it has size 1, we pick the corresponding vertex

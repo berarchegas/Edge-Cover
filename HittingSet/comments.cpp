@@ -19,6 +19,3 @@
 // We could create a library for instance that has access to everything and maintains all the data structures there
 
 // A lot of the structures that we are maintaining globally are only used in one lib, we could put it there
-
-// I think the problem is the upperBound function returns 0 in some cases (when all vertices are ignored ?)
-// Or maybe I am not rollbacking right

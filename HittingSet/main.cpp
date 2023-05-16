@@ -24,6 +24,9 @@ vector<pii> maxDegreeNode;
 // What the LowerBound would become if we ignored vertex i
 vector<int> maxLowerBound;
 
+// Sum of Vertex Degree in each edge, used for packing
+vector<int> sumOfDegrees;
+
 // blockedEdges by each vertex in the costly discard packing bound
 vector<vector<int>> blockedEdges;
 
@@ -70,7 +73,7 @@ int branchAndBound(int shift) {
 
     lowerBound = max(lowerBound, maxDegreeBound(vertices, validVertices, validEdges) + shift);
 
-    if (lowerBound > upperBound) {
+    if (lowerBound >= upperBound) {
         // cout << "Pruning" << endl;
         return upperBound;
     }
@@ -83,16 +86,16 @@ int branchAndBound(int shift) {
     lowerBound = max(lowerBound, efficiencyBound(vertices, edges, validEdges, 
         validVertices, maxDegree, maxDegreeNode, maxLowerBound) + shift);
 
-    if (lowerBound > upperBound) {
+    if (lowerBound >= upperBound) {
         // cout << "Pruning" << endl;
         return upperBound;
     }
     
     // cout << "Packing Bound " << endl;
 
-    lowerBound = max(lowerBound, packingBound(n, edges, validEdges) + shift);
+    lowerBound = max(lowerBound, packingBound(n, edges, validEdges, vertices, sumOfDegrees) + shift);
 
-    if (lowerBound > upperBound) {
+    if (lowerBound >= upperBound) {
         // cout << "Pruning" << endl;
         return upperBound;
     }
@@ -100,9 +103,9 @@ int branchAndBound(int shift) {
     // cout << "Sum Over Packing Bound " << endl;
 
     lowerBound = max(lowerBound, sumOverPackingBound(n, vertices, 
-        edges, validVertices, validEdges) + shift);
+        edges, validVertices, validEdges, sumOfDegrees) + shift);
 
-    if (lowerBound > upperBound) {
+    if (lowerBound >= upperBound) {
         // cout << "Pruning" << endl;
         return upperBound;
     }
@@ -132,10 +135,12 @@ int branchAndBound(int shift) {
         }
     }
 
+    // cout << "Costly Discard for Efficiency" << endl;
+
     vector<int> nodes = validVertices.elements();
 
     for (int x : nodes) {
-        if (maxLowerBound[x] > upperBound) {
+        if (maxLowerBound[x] >= upperBound) {
 
             takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
             upperBound = min(upperBound, branchAndBound(shift + 1));
@@ -147,10 +152,12 @@ int branchAndBound(int shift) {
         }
     }
 
-    costlyDiscardPackingBound(n, edges, validEdges, validVertices, blockedEdges, maxLowerBound);
+    // cout << "Costly Discard for Packing" << endl;
+
+    costlyDiscardPackingBound(n, edges, validEdges, vertices, validVertices, blockedEdges, maxLowerBound, sumOfDegrees);
 
     for (int x : nodes) {
-        if (maxLowerBound[x] > upperBound) {
+        if (maxLowerBound[x] >= upperBound) {
 
             takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
             upperBound = min(upperBound, branchAndBound(shift + 1));
@@ -161,12 +168,14 @@ int branchAndBound(int shift) {
 
         }
     }
+
+    // cout << "Costly Discard for Repacking" << endl;
 
     repacking(n, vertices, edges, validVertices, validEdges, 
-        operations, maxLowerBound, bucket, ans);
+        operations, maxLowerBound, bucket, ans, sumOfDegrees);
 
     for (int x : nodes) {
-        if (maxLowerBound[x] > upperBound) {
+        if (maxLowerBound[x] >= upperBound) {
 
             takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
             upperBound = min(upperBound, branchAndBound(shift + 1));
@@ -260,6 +269,7 @@ int main() {
     validVertices = OrderedSubsetList(vector<int>(), n);
     vertices = vector<OrderedSubsetList> (n);
     maxLowerBound = vector<int> (n);
+    blockedEdges = vector<vector<int>> (n);
     for (int i = 0; i < n; i++) {
         validVertices.pushBack(i);
         vertices[i] = OrderedSubsetList(vector<int>(), m);
@@ -267,9 +277,9 @@ int main() {
 
     validEdges = OrderedSubsetList(vector<int>(), m);
     edges = vector<OrderedSubsetList> (m);
-    blockedEdges = vector<vector<int>> (m);
     maxDegree = vector<pii> (m);
     maxDegreeNode = vector<pii> (m);
+    sumOfDegrees = vector<int> (m);
     for (int i = 0; i < m; i++) {
         validEdges.pushBack(i);
         edges[i] = OrderedSubsetList(vector<int>(), n);
@@ -292,18 +302,5 @@ int main() {
 
     cout << branchAndBound(0) << '\n';
 
-    for (int x : ans) cout << x << ' ';
-    cout << '\n';
-
-    while (!operations.empty()) 
-        undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
-
-    bool ok = true;
-    for (int i = 0; i < m; i++) {
-        bool tem = false;
-        for (int x : ans) tem |= edges[i].getState(x);
-        ok &= tem;
-    }
-    cout << ok << '\n';
     return 0;
 }
