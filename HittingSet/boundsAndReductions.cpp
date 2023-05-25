@@ -10,6 +10,13 @@ using pii = pair<int, int>;
 int calculateUpperbound(int m, vector<OrderedSubsetList> &vertices, vector<OrderedSubsetList> &edges,
     vector<vector<int>> &bucket, OrderedSubsetList &validVertices,
     OrderedSubsetList &validEdges, stack<pii> &operations, vector<int> &ans) {
+
+    for (int i = 0; i <= m; i++) bucket[i].clear();
+    vector<int> validos = validVertices.elements();
+    for (int x : validos) {
+        bucket[m].push_back(x);
+    }
+
     int resp = 0;
     int initialSize = operations.size();
     
@@ -31,12 +38,6 @@ int calculateUpperbound(int m, vector<OrderedSubsetList> &vertices, vector<Order
     while (operations.size() > initialSize) {
         undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
     }    
-
-    bucket[0].clear();
-    vector<int> validos = validVertices.elements();
-    for (int x : validos) {
-        bucket[m].push_back(x);
-    }
 
     return resp;
 }
@@ -194,6 +195,9 @@ void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedS
         for (int y : v) sumOfDegrees[x] += vertices[y].getSize();
     }
 
+    vector<int> v = validVertices.elements();
+    for (int x : v) blockedEdges[x].clear();
+
     sort(e.begin(), e.end(), [&] (int a, int b) {
         return sumOfDegrees[a] < sumOfDegrees[b];
     });
@@ -226,10 +230,10 @@ void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedS
             }
         }
 
-        // if the edge only has one vertex it is in the packing
+        // if the edge only has one vertex it is already in the packing
         if (cnt == 1 && nodes.size() > 1) {
             blockedEdges[block].push_back(x);
-        } 
+        }
 
     }
 
@@ -253,6 +257,7 @@ void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedS
             if (ok) {
                 extraPacking.push_back(y);
                 for (int z : verts) {
+                    if (z == x) continue;
                     valid[z] = false;
                 }
             }
@@ -262,6 +267,7 @@ void costlyDiscardPackingBound(int n, vector<OrderedSubsetList> &edges, OrderedS
             vector<int> verts = edges[y].elements();
 
             for (int z : verts) {
+                if (z == x) continue;
                 valid[z] = true;
             } 
 
@@ -304,7 +310,7 @@ int sumOverPackingBound(int n, vector<OrderedSubsetList> &vertices, vector<Order
     
     }
 
-    int goal = validEdges.getSize(), sum = 0, ans = 0;
+    int goal = validEdges.getSize() - packing.size(), sum = 0, ans = 0;
     for (int x : packing) {
         vector<int> nodes = edges[x].elements();
         int maxDegree = 0;

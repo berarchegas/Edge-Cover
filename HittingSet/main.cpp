@@ -140,7 +140,7 @@ int branchAndBound(int shift) {
     vector<int> nodes = validVertices.elements();
 
     for (int x : nodes) {
-        if (maxLowerBound[x] >= upperBound) {
+        if (maxLowerBound[x] + shift >= upperBound) {
 
             takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
             upperBound = min(upperBound, branchAndBound(shift + 1));
@@ -157,7 +157,7 @@ int branchAndBound(int shift) {
     costlyDiscardPackingBound(n, edges, validEdges, vertices, validVertices, blockedEdges, maxLowerBound, sumOfDegrees);
 
     for (int x : nodes) {
-        if (maxLowerBound[x] >= upperBound) {
+        if (maxLowerBound[x] + shift >= upperBound) {
 
             takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
             upperBound = min(upperBound, branchAndBound(shift + 1));
@@ -175,7 +175,7 @@ int branchAndBound(int shift) {
         operations, maxLowerBound, bucket, ans, sumOfDegrees);
 
     for (int x : nodes) {
-        if (maxLowerBound[x] >= upperBound) {
+        if (maxLowerBound[x] + shift >= upperBound) {
 
             takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
             upperBound = min(upperBound, branchAndBound(shift + 1));
