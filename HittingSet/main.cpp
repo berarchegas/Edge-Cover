@@ -43,6 +43,8 @@ stack<pii> operations;
 
 vector<int> ans;
 
+int cnt = 0;
+
 
 int branchAndBound(int shift) {
     // cout << "Start"<< endl;
@@ -58,6 +60,8 @@ int branchAndBound(int shift) {
         // cout << "Invalid Branch" << endl;
         return upperBound;
     }
+
+    cnt++;
 
     int initialSize = operations.size();
 
@@ -78,8 +82,8 @@ int branchAndBound(int shift) {
         return upperBound;
     }
 
-    vector<int> valid = validVertices.elements();
-    for (int x : valid) maxLowerBound[x] = 0;
+    vector<int> nodes = validVertices.elements();
+    for (int x : nodes) maxLowerBound[x] = 0;
 
     // cout << "Calculate Efficiency Bound" << endl;
 
@@ -114,59 +118,67 @@ int branchAndBound(int shift) {
 
     vector<int> unitEdges = unitEdgeRule(edges, validEdges);
 
+    int took = 0;
     for (int x : unitEdges) {
         if (edges[x].getSize() == 1) {
+
             int vertice = edges[x].elements()[0];
-
-            // cout << "Force Take " << vertice << endl;
-
+            took++;
             takeVertex(vertice, vertices, edges, validVertices, validEdges, operations, ans);
-            upperBound = min(upperBound, branchAndBound(shift + 1));
-            while (operations.size() > initialSize) 
-                undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
-
-            return upperBound;
+        
         }
-        else {
+    }
 
-            // Here we have an invalid branch
-            // cout << "Empty Edge " << x << endl;
-            return upperBound;
-        }
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
     }
 
     // cout << "Costly Discard for Efficiency" << endl;
 
-    vector<int> nodes = validVertices.elements();
+    nodes = validVertices.elements();
 
+    took = 0;
     for (int x : nodes) {
         if (maxLowerBound[x] + shift >= upperBound) {
 
+            took++;
             takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
-            upperBound = min(upperBound, branchAndBound(shift + 1));
-            while (operations.size() > initialSize) 
-                undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
-
-            return upperBound;
 
         }
+    }
+
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
     }
 
     // cout << "Costly Discard for Packing" << endl;
 
     costlyDiscardPackingBound(n, edges, validEdges, vertices, validVertices, blockedEdges, maxLowerBound, sumOfDegrees);
 
+    took = 0;
     for (int x : nodes) {
         if (maxLowerBound[x] + shift >= upperBound) {
 
+            took++;
             takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
-            upperBound = min(upperBound, branchAndBound(shift + 1));
-            while (operations.size() > initialSize) 
-                undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
-
-            return upperBound;
 
         }
+    }
+
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
     }
 
     // cout << "Costly Discard for Repacking" << endl;
@@ -174,17 +186,22 @@ int branchAndBound(int shift) {
     repacking(n, vertices, edges, validVertices, validEdges, 
         operations, maxLowerBound, bucket, ans, sumOfDegrees);
 
+    took = 0;
     for (int x : nodes) {
         if (maxLowerBound[x] + shift >= upperBound) {
 
+            took++;
             takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
-            upperBound = min(upperBound, branchAndBound(shift + 1));
-            while (operations.size() > initialSize) 
-                undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
-
-            return upperBound;
 
         }
+    }
+
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
     }
 
     // cout << "Invalid Edges" << endl;
@@ -194,6 +211,137 @@ int branchAndBound(int shift) {
     for (int x : invalidEdges) {
         // cout << "Erase Invalid Edge " << x << endl;
         eraseEdge(x, vertices, edges, validEdges, operations);
+    }
+
+    // cout << "Unit Edge Rule" << endl;
+
+    unitEdges = unitEdgeRule(edges, validEdges);
+
+    took = 0;
+    for (int x : unitEdges) {
+        if (edges[x].getSize() == 1) {
+
+            int vertice = edges[x].elements()[0];
+            took++;
+            takeVertex(vertice, vertices, edges, validVertices, validEdges, operations, ans);
+        
+        }
+    }
+    
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
+    }
+
+
+    ////////////////////
+
+
+    lowerBound = max(lowerBound, maxDegreeBound(vertices, validVertices, validEdges) + shift);
+
+    if (lowerBound >= upperBound) {
+        // cout << "Pruning" << endl;
+        return upperBound;
+    }
+
+    nodes = validVertices.elements();
+    for (int x : nodes) maxLowerBound[x] = 0;
+
+    // cout << "Calculate Efficiency Bound" << endl;
+
+    lowerBound = max(lowerBound, efficiencyBound(vertices, edges, validEdges, 
+        validVertices, maxDegree, maxDegreeNode, maxLowerBound) + shift);
+
+    if (lowerBound >= upperBound) {
+        // cout << "Pruning" << endl;
+        return upperBound;
+    }
+    
+    // cout << "Packing Bound " << endl;
+
+    lowerBound = max(lowerBound, packingBound(n, edges, validEdges, vertices, sumOfDegrees) + shift);
+
+    if (lowerBound >= upperBound) {
+        // cout << "Pruning" << endl;
+        return upperBound;
+    }
+    
+    // cout << "Sum Over Packing Bound " << endl;
+
+    lowerBound = max(lowerBound, sumOverPackingBound(n, vertices, 
+        edges, validVertices, validEdges, sumOfDegrees) + shift);
+
+    if (lowerBound >= upperBound) {
+        // cout << "Pruning" << endl;
+        return upperBound;
+    }
+
+    // cout << "Costly Discard for Efficiency" << endl;
+
+    took = 0;
+    for (int x : nodes) {
+        if (maxLowerBound[x] + shift >= upperBound) {
+
+            took++;
+            takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
+
+        }
+    }
+
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
+    }
+
+    // cout << "Costly Discard for Packing" << endl;
+
+    costlyDiscardPackingBound(n, edges, validEdges, vertices, validVertices, blockedEdges, maxLowerBound, sumOfDegrees);
+
+    took = 0;
+    for (int x : nodes) {
+        if (maxLowerBound[x] + shift >= upperBound) {
+
+            took++;
+            takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
+
+        }
+    }
+
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
+    }
+
+    // cout << "Costly Discard for Repacking" << endl;
+
+    repacking(n, vertices, edges, validVertices, validEdges, 
+        operations, maxLowerBound, bucket, ans, sumOfDegrees);
+
+    took = 0;
+    for (int x : nodes) {
+        if (maxLowerBound[x] + shift >= upperBound) {
+
+            took++;
+            takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
+
+        }
+    }
+
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
     }
 
     // cout << "Invalid Vertices" << endl;
@@ -209,28 +357,136 @@ int branchAndBound(int shift) {
 
     unitEdges = unitEdgeRule(edges, validEdges);
 
-    // We are running this again because the Invalid Vertex/Edge rule
-    // would sometimes create branches where we need to force take a vertex
+    took = 0;
     for (int x : unitEdges) {
         if (edges[x].getSize() == 1) {
+
             int vertice = edges[x].elements()[0];
-
-            // cout << "Force Take " << vertice << endl;
-
+            took++;
             takeVertex(vertice, vertices, edges, validVertices, validEdges, operations, ans);
-            upperBound = min(upperBound, branchAndBound(shift + 1));
-            while (operations.size() > initialSize) 
-                undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
-
-            return upperBound;
-        }
-        else {
-            
-            // Here we have an invalid branch
-            // cout << "Empty Edge " << x << endl;
-            return upperBound;
+        
         }
     }
+    
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
+    }
+
+
+    ////////////////////
+
+
+    lowerBound = max(lowerBound, maxDegreeBound(vertices, validVertices, validEdges) + shift);
+
+    if (lowerBound >= upperBound) {
+        // cout << "Pruning" << endl;
+        return upperBound;
+    }
+
+    nodes = validVertices.elements();
+    for (int x : nodes) maxLowerBound[x] = 0;
+
+    // cout << "Calculate Efficiency Bound" << endl;
+
+    lowerBound = max(lowerBound, efficiencyBound(vertices, edges, validEdges, 
+        validVertices, maxDegree, maxDegreeNode, maxLowerBound) + shift);
+
+    if (lowerBound >= upperBound) {
+        // cout << "Pruning" << endl;
+        return upperBound;
+    }
+    
+    // cout << "Packing Bound " << endl;
+
+    lowerBound = max(lowerBound, packingBound(n, edges, validEdges, vertices, sumOfDegrees) + shift);
+
+    if (lowerBound >= upperBound) {
+        // cout << "Pruning" << endl;
+        return upperBound;
+    }
+    
+    // cout << "Sum Over Packing Bound " << endl;
+
+    lowerBound = max(lowerBound, sumOverPackingBound(n, vertices, 
+        edges, validVertices, validEdges, sumOfDegrees) + shift);
+
+    if (lowerBound >= upperBound) {
+        // cout << "Pruning" << endl;
+        return upperBound;
+    }
+
+    // cout << "Costly Discard for Efficiency" << endl;
+
+    took = 0;
+    for (int x : nodes) {
+        if (maxLowerBound[x] + shift >= upperBound) {
+
+            took++;
+            takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
+
+        }
+    }
+
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
+    }
+
+    // cout << "Costly Discard for Packing" << endl;
+
+    costlyDiscardPackingBound(n, edges, validEdges, vertices, validVertices, blockedEdges, maxLowerBound, sumOfDegrees);
+
+    took = 0;
+    for (int x : nodes) {
+        if (maxLowerBound[x] + shift >= upperBound) {
+
+            took++;
+            takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
+
+        }
+    }
+
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
+    }
+
+    // cout << "Costly Discard for Repacking" << endl;
+
+    repacking(n, vertices, edges, validVertices, validEdges, 
+        operations, maxLowerBound, bucket, ans, sumOfDegrees);
+
+    took = 0;
+    for (int x : nodes) {
+        if (maxLowerBound[x] + shift >= upperBound) {
+
+            took++;
+            takeVertex(x, vertices, edges, validVertices, validEdges, operations, ans);
+
+        }
+    }
+
+    if (took) {
+        upperBound = min(upperBound, branchAndBound(shift + took));
+        while (operations.size() > initialSize) 
+            undo(vertices, edges, validVertices, validEdges, operations, bucket, ans);
+
+        return upperBound;
+    }
+
+
+    ////////////////////
+
 
     int branchNode = -1, maximumDegree = -1;
     nodes = validVertices.elements();
@@ -301,6 +557,6 @@ int main() {
     }
 
     cout << branchAndBound(0) << '\n';
-
+    cout << cnt << '\n';
     return 0;
 }

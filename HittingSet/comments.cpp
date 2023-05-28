@@ -17,5 +17,3 @@
 // We could also test always going through every vertex and edge instead of getting vectors with active elements
 
 // We could create a library for instance that has access to everything and maintains all the data structures there
-
-// A lot of the structures that we are maintaining globally are only used in one lib, we could put it there

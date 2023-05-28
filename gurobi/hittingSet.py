@@ -18,10 +18,9 @@ model.setObjective(
 # Recebe hiperarestas e insere as restricoes
 edges = list()
 for i in range(m):
-    sz = int(input())
-    edges.append(list(map(int, input().split())))
+    edges.append(list(map(int, input().split()))[1:])
     vertices = list()
-    for j in range(sz):
+    for j in range(len(edges[i])):
         vertices.append(variables[edges[i][j]])
     model.addConstr(
         gp.quicksum(vertices[j] for j in range(len(vertices))) >= 1)

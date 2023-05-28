@@ -12,7 +12,7 @@ int main() {
     set<vector<int>> st;
     while (st.size() < m) {
         ll msk = rng() % ((1ll << n) - 1) + 1;
-        if (__builtin_popcountll(msk) > 5) continue;
+        if (__builtin_popcountll(msk) > 15) continue;
         vector<int> ans;
         for (int i = 0; i < n; i++) {
             if (msk & (1ll << i)) ans.push_back(i);
@@ -21,7 +21,7 @@ int main() {
     }
     cout << n << ' ' << m << '\n';
     for (vector<int> x : st) {
-        cout << x.size() << '\n';
+        cout << x.size() << ' ';
         for (int y : x) cout << y << ' ';
         cout << '\n';
     }
