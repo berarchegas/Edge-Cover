@@ -313,13 +313,18 @@ int sumOverPackingBound(int n, vector<OrderedSubsetList> &vertices, vector<Order
     int goal = validEdges.getSize() - packing.size(), sum = 0, ans = 0;
     for (int x : packing) {
         vector<int> nodes = edges[x].elements();
-        int maxDegree = 0;
+        int maxDegree = -1, bestNode = -1;
 
         for (int y : nodes) {
-            maxDegree = max(maxDegree, vertices[y].getSize() - 1);
+            if (vertices[y].getSize() - 1 > maxDegree) {
+                maxDegree = vertices[y].getSize() - 1;
+                bestNode = y;
+            }
+            valid[y] = true;
         } 
 
         sum += maxDegree;
+        valid[bestNode] = false;
         ans++;
 
     }
