@@ -14,7 +14,7 @@ int calculateUpperbound(int m, vector<OrderedSubsetList> &vertices, vector<Order
     for (int i = 0; i <= m; i++) bucket[i].clear();
     vector<int> validos = validVertices.elements();
     for (int x : validos) {
-        bucket[m].push_back(x);
+        bucket[vertices[x].getSize()].push_back(x);
     }
 
     int resp = 0;
@@ -51,6 +51,7 @@ int maxDegreeBound(vector<OrderedSubsetList> &vertices, OrderedSubsetList &valid
     OrderedSubsetList &validEdges) {
     int maxDegree = 0;
     vector<int> valid = validVertices.elements();
+    if (valid.empty()) cout << "VAZIO MANOU" << endl;
     for (int x : valid) {
         maxDegree = max(maxDegree, vertices[x].getSize());
     }

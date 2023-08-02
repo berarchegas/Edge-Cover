@@ -1,0 +1,45 @@
+Bound: Somatorio de max(0, out - in) pra cada vertice, pro DAG com todos os caminhos isso é exato, se não é só um bound
+
+Bound: Euler com mais coisa (max((out + in) / 2) pra quando soma de max(0, out - in) de uma componente é 0?)
+
+Talvez pensar na variante do problema em que nem sempre tem solucao
+
+Enhance the packing bounds
+
+Possibly use some kind of hot starting because we do DFS
+    This seems very doable
+
+Interleaved DFS
+Randomization, Restart strategies, start the interleaf when finding a tie in the greatest degree
+BFS with diving (temos restricoes de memoria, talvez contornar se voltassemos poucas vezes)
+Interleaved seems more doable tho
+
+Try to think of some kind of Arc Consistency or Nogood recording
+Primeiro modelar nosso problema como um CSP (busca binaria ?) (relacao com o upper bound ?)
+    Cada caminho é uma variavel binaria
+    Restricoes: Soma das variaveis binarias <= UB
+    Soma dos caminhos que passam por cada aresta >= 1
+Ver se conseguimos calcular consistencia de arco para um unico constraint (besta)
+Forward Checking: Uma aresta só tem um unico caminho nao definido (Unit Edge Rule) Ja fazemos
+
+Que tal fazer branching sobre o caminho que esta na aresta de menor grau ?
+Ver se conseguimos definir o que torna uma solucao inconsistente de forma efetiva (nogood, n tentei pensar ainda)
+
+Busca heuristica no comeco do B&B para ja comecar com uma solução incumbente decente (só no começo)
+
+Melhorar o Sum of Degrees Bound usando um preprocessamento n^2 (Tipo um inclusao exclusao incompleto) ou ate n^3
+    Escolhi os caminhos A1, A2, A3, A4, A5, posso subtrair as arestas que estao nos pares (A1, A2), (A2, A3), (A3, A4), (A4, A5)
+    Com a garantia de contar cada aresta pelo menos uma vez
+    Isso da ruim pois pode ser que Ax seja maior que A2 - (A1, A2) por exemplo
+    N rola bruh
+
+Pensar no solver exatos para classes de grafos podendo repetir aresta
+
+Max Weighted Cut pra DAG
+
+Independent strategies
+
+Diferentes Branchings
+
+DSU
+Wide (escolher qual caminho passa por uma aresta)
