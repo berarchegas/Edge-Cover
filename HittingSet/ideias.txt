@@ -42,4 +42,71 @@ Independent strategies
 Diferentes Branchings
 
 DSU
-Wide (escolher qual caminho passa por uma aresta)
+    Binario, escolher um par que tem uma quantidade parecida de vertices que soh cobrem um e vertices que cobrem os dois
+    Precalcular isso soh no comeco
+    Talvez usar esse branching apenas no comeco (tipo fazer esse branching c vezes) pq dps de um tempo deve ficar desequilibrado
+    Ou fazer esse branching enquanto continuar relativamente equilibrado e dps passar para uma outra estrategia
+    Nao precisa de DSU, soh vamos fixar alguns vertices fora da resposta
+    Precisamos codar a versao exata tho
+
+Wide (escolher qual caminho passa por uma aresta) (Problema: Overcounting) (prohibited)
+    Codamos e o prohibited conserta o problema de Overcounting
+    Implementamos um preprocessamento para a ordem dos vertices
+    Em instancias com muita aresta e pouco vertice ele apanha bastante
+
+Costly Inclusion
+
+Pensar nas alteracoes para o solver exato
+
+Lower Bounds - Normal
+Upper Bound - 
+Unit Edge Rule - Depende se vamos permitir que o problema nao tenha solucao
+Edge Domination Rule - Nao podemos pegar os vertices fora da intersecao (depende se vamos permitir...)
+Vertex Domination Rule - Deixa de fazer sentido
+
+Operacao de colocar um vertice na resposta agora eh bem custosa (tem que bloquear todos os vertices que tem intersecao com ele)
+Branching depende muito do tipo da instancia né (caminhos longos ou nao) (talvez trabalhar no k-PSEC com k pequeno)
+Acho que temos que definir uma classe especifica de instancias para trabalhar, pq tudo fica mt no depende
+
+https://garethrees.org/2007/06/10/zendoku-generation/#section-4.2
+Qd possivel, fazer o branching em cima de pontes
+Se nao, fazer o branching em cima de vertices de grau baixo para criar pontes (como saber grau de vertice? soh manter um vetor global)
+Tentar fazer um divide and conquer e achar um corte de tamanho pequeno que divide o grafo mais ou menos pela metade
+
+Erdos renyi
+Preferential Attachment
+
+Particao
+Nao direcionado
+Nao gerar tudo inviavel
+Nao gerar muito facil tbm
+Criar uma solucao viavel e dai gerar os caminhos
+Achar se o problema eh viavel eh np dificil ? (Prove)
+Path partition
+
+Graph decomposition is NPC - a complete proof of Holyer's conjecture
+The NP-Completeness of Some Edge-Partition Problems - nao consegui acessar
+
+Instancias:
+3DMR
+    Bloco de tamanho 7
+    Juntar blocos separados
+    Juntar de 3 em 3 (random ou nao) OK
+Transformar instancias do 3dmr em PCEC OK
+Erdos Renyi (esparsos e densos) OK 
+Preferential Attachment OK
+Redes reais (Pegar dps que eu tiver uma ideia do tamanho)
+Arvore random e dai adicionar arestas random OK
+
+Caminhos:
+Comecar em uma aresta e ir expandindo aleatorio para algum lado OK
+Pegar todos os caminhos de tamanho 3 OK
+Pegar varios caminhos pequenos e varios caminhos grandes
+Definir uma probabilidade do caminho terminar (ir expandindo ate nao dar mais ou ate bater na probabilidade)
+
+Existe uma instancia dificil do 3DMR ?
+    Fazer 000, 111, 222... e depois juntar em pares para que tenha soh uma resposta possivel
+    0 e 1 aparecem sempre em pares e o 2 sempre sozinho
+    Com isso conseguimos fazer instancias dificeis grandes com n multiplo de 3
+    Isso garante
+
