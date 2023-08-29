@@ -33,7 +33,7 @@ for i in range(m):
     for j in range(p):
         contains = False
         for k in range(len(paths[j]) - 1):
-            if edges[i][0] == paths[j][k] and edges[i][1] == paths[j][k + 1]:
+            if (edges[i][0] == paths[j][k] and edges[i][1] == paths[j][k + 1]) or (edges[i][0] == paths[j][k + 1] and edges[i][1] == paths[j][k]):
                 contains = True
         if contains:
             constraint.append(variables[j])
@@ -44,8 +44,8 @@ for i in range(m):
 model.optimize()
 
 # Imprime quais caminhos foram utilizados
-# for i in range(p):
-#     if variables[i].X == 1:
-#         print("Caminho", i, "foi utilizado!")
-#     else: 
-#         print("Caminho", i, "não foi utilizado!")
+for i in range(p):
+    if variables[i].X == 1:
+        print("Caminho", paths[i], "foi utilizado!")
+    # else: 
+        # print("Caminho", i, "não foi utilizado!")

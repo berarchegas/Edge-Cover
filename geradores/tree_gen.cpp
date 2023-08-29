@@ -22,6 +22,7 @@ void dfs(int node, int p = 0) {
 }
 
 int main () { 
+    freopen("in.txt", "w", stdout);
 	int n, m;
 	cin >> n >> m;
 	for (int i = 0; i < n-2; i++) {
@@ -60,7 +61,7 @@ int main () {
     }
 	cout << n << ' ' << m << '\n';
     for (int i = 1; i <= n; i++) {
-        for (int x : v[i]) if (x > i) cout << i << ' ' << x << '\n';
+        for (int x : v[i]) if (x > i) cout << i - 1 << ' ' << x - 1 << '\n';
     }
     return 0;
 }

@@ -12,6 +12,7 @@ const int MAXN = 1e5 + 5;
 vector<int> graph[MAXN];
 
 int main () { 
+    freopen("in.txt", "w", stdout);
 	int n;
 	cin >> n;
     int e = 0;
@@ -33,7 +34,7 @@ int main () {
     }
     cout << n << ' ' << e << '\n';
     for (int i = 1; i <= n; i++) {
-        for (int x : graph[i]) if (x > i) cout << i << ' ' << x << '\n';
+        for (int x : graph[i]) if (x > i) cout << i - 1 << ' ' << x - 1 << '\n';
     }
     return 0;
 }

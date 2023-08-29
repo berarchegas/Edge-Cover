@@ -14,6 +14,7 @@ set<int> v[MAXN];
 vector<vector<int>> paths;
 
 int main () { 
+    freopen("in.txt", "w", stdout);
     int n, a, b, c;
     cin >> n;
     for (int i = 0; i < 2 * n; i++) {
@@ -34,12 +35,29 @@ int main () {
     }
     for (int i = 0; i < 2 * n; i++) {
         // auxiliares
+        paths.push_back({4 * i, 4 * i + 3});
+        paths.push_back({4 * i + 1, 4 * i + 3});
+        paths.push_back({4 * i + 2, 4 * i + 3});
         for (int x : v[4 * i + 3]) {
             paths.push_back({4 * i, 4 * i + 3, x});
             paths.push_back({4 * i + 1, 4 * i + 3, x});
+            paths.push_back({4 * i + 2, 4 * i + 3, x});
         }
     }
+    for (int i = 2 * n; i < 3 * n; i++) {
+        // auxiliares
+        paths.push_back({8 * n + 2 * (i - 2 * n), 8 * n + 2 * (i - 2 * n) + 1});
+    }
+
+    int m = 0;
+    for (int i = 0; i < 10 * n; i++) m += v[i].size();
+
+    cout << 10 * n << ' ' << m << ' ' << paths.size() << '\n';
+    for (int i = 0; i < 10 * n; i++) {
+        for (int x : v[i]) cout << i << ' ' << x << '\n';
+    }
     for (auto x : paths) {
+        cout << x.size() << '\n';
         for (int y : x) cout << y << ' ';
         cout << '\n';
     }

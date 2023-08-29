@@ -87,26 +87,54 @@ Path partition
 Graph decomposition is NPC - a complete proof of Holyer's conjecture
 The NP-Completeness of Some Edge-Partition Problems - nao consegui acessar
 
+Soh determinar se eh viavel ja eh np dificil por causa do paper do Graph Decomposition is NPC
+
 Instancias:
 3DMR
     Bloco de tamanho 7
     Juntar blocos separados
     Juntar de 3 em 3 (random ou nao) OK
-Transformar instancias do 3dmr em PCEC OK
+Transformar instancias do 3dmr em PCEC OK Instancias geradas e eh deboas
 Erdos Renyi (esparsos e densos) OK 
 Preferential Attachment OK
 Redes reais (Pegar dps que eu tiver uma ideia do tamanho)
 Arvore random e dai adicionar arestas random OK
 
-Caminhos:
-Comecar em uma aresta e ir expandindo aleatorio para algum lado OK
-Pegar todos os caminhos de tamanho 3 OK
-Pegar varios caminhos pequenos e varios caminhos grandes
-Definir uma probabilidade do caminho terminar (ir expandindo ate nao dar mais ou ate bater na probabilidade)
+Grafos:
+Erdos Renyi densos OK
+Erdos Renyi esparsos OK
+Preferential Attachment OK
+Arvores random adicionando arestas OK
+Redes reais
 
-Existe uma instancia dificil do 3DMR ?
+Caminhos:
+Comecar em uma aresta e ir expandindo random
+Todos os caminhos de tamanho 3
+
+Existe uma instancia dificil do 3DMR OK
     Fazer 000, 111, 222... e depois juntar em pares para que tenha soh uma resposta possivel
     0 e 1 aparecem sempre em pares e o 2 sempre sozinho
     Com isso conseguimos fazer instancias dificeis grandes com n multiplo de 3
-    Isso garante
+    Isso garante que a instancia eh dificil
 
+Ex:
+000 005
+111 211 112
+222 020 200
+333 353
+444 233
+555 
+
+xor bitset
+
+detectar inviabilidade
+
+upper bound fica mt dificil de fazer
+
+simetria de grupos de caminhos ({1, 2}, {3, 4, 5}) e ({1, 2, 3}, {4, 5}) (hashing?)
+
+heuristicas de problemas em que a inviabilidade edificio
+
+GRASP
+
+Rounding com PL
