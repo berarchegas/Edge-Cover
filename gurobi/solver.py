@@ -44,8 +44,8 @@ for i in range(m):
 model.optimize()
 
 # Imprime quais caminhos foram utilizados
-for i in range(p):
-    if variables[i].X == 1:
-        print("Caminho", paths[i], "foi utilizado!")
-    # else: 
-        # print("Caminho", i, "não foi utilizado!")
+# for i in range(p):
+#     if variables[i].X == 1:
+#         print("Caminho", paths[i], "foi utilizado!")
+#     else: 
+#         print("Caminho", i, "não foi utilizado!")

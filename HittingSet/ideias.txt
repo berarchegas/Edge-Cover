@@ -117,24 +117,52 @@ Existe uma instancia dificil do 3DMR OK
     Com isso conseguimos fazer instancias dificeis grandes com n multiplo de 3
     Isso garante que a instancia eh dificil
 
-Ex:
-000 005
-111 211 112
-222 020 200
-333 353
-444 233
-555 
-
 xor bitset
 
 detectar inviabilidade
+    grafo de implicacoes (2SAT da vida)
+    nogood - pegar uma possicao impossivel e dai ver quais arestas nao estao cobertas
+    o conjunto de selecao de variaveis dos caminhos que passam por aquela aresta eh um nogood
+    pegar as arestas nao cobertas e ver quais caminhos bloqueiam os caminhos que passam por aquela aresta
+
+Como usar o nogood ? 
+    Se na intersecao do nogood tiver alguma aresta sabemos que todos os caminhos que passam por aquela aresta devem ser apagados
+    Guardar na memoria para uso futuro?
+    Fazer o jumpback na recursao
+
+Arc Consistency 
+    Quero conseguir cobrir 2 caras que nao estao em nenhum caminho juntos mas estao pertos
+    ou x caras
+    soh mantenho os caminhos que participam de alguma solucao
 
 upper bound fica mt dificil de fazer
 
 simetria de grupos de caminhos ({1, 2}, {3, 4, 5}) e ({1, 2, 3}, {4, 5}) (hashing?)
 
-heuristicas de problemas em que a inviabilidade edificio
+heuristicas de problemas em que a inviabilidade eh dificil - pessoal faz busca local ou usa alguma meta heuristica no meio do BB
 
-GRASP
+GRASP e Simulated Annealing
 
-Rounding com PL
+Rounding com PL - nao achei mt coisa
+
+VNS VND RVND VLNS
+
+NAO usei o scihub pra ver que o artigo era aquilo mesmo do P3
+
+Como ler o gurobipy
+
+Fiz as instancias usando o gurobi pra ver quais tamanhos eram bons e agora ta bem codado ent eh facil fazer mais
+
+Fiz o construtivo mas ele n parece ser mt dificil kkkkkkkkkk
+
+Gurobi deixar single thread
+
+Cplex
+
+generalizar mais o nogood pensar em duplas ou trios
+
+m - #edges + 1?
+
+options are the paths
+items are the edges
+
