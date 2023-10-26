@@ -180,6 +180,8 @@ Iterar pelo caminho escolhido para achar as novas componentes
 Nessa primeira versao nao vamos implementar nenhuma heuristica nem bound
 O solver vai soh iterar por todas as solucoes para todos os representantes e retornar a melhor combinacao
 
+o hideLine pro table[1] ta errado pq ele esconde tudo menor um cara
+
 int search(int rep):
 // devolve o melhor resultado para a componente de rep
 // devolve tudo devidamente rollbackeado

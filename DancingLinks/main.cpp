@@ -134,6 +134,7 @@ int main() {
     int a, b, cnt = 1;
     for (int i = 0; i < m; i++) {
         cin >> a >> b;
+        a--, b--;
         ed[a][b] = ed[b][a] = cnt++;
     }
     for (int i = 0; i < p; i++) {
@@ -142,8 +143,10 @@ int main() {
         vector<int> option(tam - 1);
         int ini, fim; 
         cin >> ini;
+        ini--;
         for (int j = 0; j < tam - 1; j++) {
             cin >> fim;
+            fim--;
             option[j] = ed[ini][fim];
             items = max(items, option[j]);
             ini = fim;

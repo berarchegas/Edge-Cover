@@ -26,7 +26,7 @@ int main () {
     }
     cout << n << ' ' << m << '\n';
     for (int i = 1; i <= n; i++) {
-        for (int x : v[i]) if (x > i) cout << i - 1 << ' ' << x - 1 << '\n';
+        for (int x : v[i]) if (x > i) cout << i << ' ' << x << '\n';
     }
     return 0;
 }

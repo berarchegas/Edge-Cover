@@ -14,6 +14,40 @@ struct Node {
 
 int pos[MAXN];
 
+void hideEdge(bool t, int p) {
+    // hide edge p
+
+    int q = p;
+    do {
+        if (table[t][q].item <= 0) {
+            q = table[t][q].up;
+        }
+        else {
+            table[t][table[t][q].up].down = table[t][q].down;
+            table[t][table[t][q].down].up = table[t][q].up;
+            table[t][table[t][q].item].len--;
+            q++;
+        }
+    } while (q != p);
+}
+
+void unhideEdge(bool t, int p) {
+    // unhide edge p
+
+    int q = p;
+    do {
+        if (table[t][q].item <= 0) {
+            q = table[t][q].down;
+        }
+        else {
+            table[t][table[t][q].up].down = q;
+            table[t][table[t][q].down].up = q;
+            table[t][table[t][q].item].len++;
+            q--;
+        }
+    } while (q != p);
+}
+
 void hideLine(bool t, int p) {
     // hide line p
 
@@ -51,7 +85,7 @@ void unhideLine(bool t, int p) {
 void coverColumn(int i) {
     // cover column i
 
-    hideLine(1, pos[i]);
+    hideEdge(1, pos[i]);
 
     int p = table[0][i].down;
     while (p != i) {
@@ -73,50 +107,69 @@ void uncoverColumn(int i) {
         p = table[0][p].up;
     }
 
-    unhideLine(1, pos[i]);
+    unhideEdge(1, pos[i]);
 }
 
 vector<vector<int>> options;
-int tail[2][MAXN], vis[MAXN], ed[500][500], items;
+int tail[2][MAXN], vis[5000][5000], ed[500][500], items;
 pii endpoint[MAXN];
 
 // passa por todos os vertices da componente e devolve a menor aresta
-pii dfs(int node, stack<int> &reset) {
+pii dfs(int node, int dep, stack<int> &reset) {
+    cout << "dfs " << node << "  ";
     reset.push(node);
-    vis[node] = 1;
+    vis[dep][node] = 1;
     pii ans = {INF, 0};
     for (int aux = table[1][node].down; aux != node; aux = table[1][aux].down) {
         int edge = table[1][aux].option;
+        cout << edge << ' ';
+    }
+    cout << '\n';
+    for (int aux = table[1][node].down; aux != node; aux = table[1][aux].down) {
+        int edge = table[1][aux].option;
         ans = min(ans, {table[0][edge].len, edge});
-        if (!vis[endpoint[edge].first]) {
-            ans = min(ans, dfs(endpoint[edge].first, reset));
+        if (!vis[dep][endpoint[edge].first]) {
+            ans = min(ans, dfs(endpoint[edge].first, dep, reset));
         }
-        if (!vis[endpoint[edge].second]) {
-            ans = min(ans, dfs(endpoint[edge].second, reset));
+        if (!vis[dep][endpoint[edge].second]) {
+            ans = min(ans, dfs(endpoint[edge].second, dep, reset));
         }
     }
     return ans;
 }
 
-int search(int rep) {
+int search(int dep, int rep) {
+
+    cout << "search " << dep << ' ' << rep << '\n';
 
     // se o representante nao tem mais nenhuma aresta
     if (table[1][rep].down == rep) {
+        cout << "Finish " << rep << '\n';
         return 0;
     }
 
-    int ans = 1;
+    int ans = INF;
     stack<int> reset;
-    int edge = dfs(rep, reset).second;
-    
+    int edge = dfs(rep, dep, reset).second;
+
+    cout << "edge = " << edge << endl;
+
+    if (table[0][edge].down == edge) {
+        cout << "Deu ruim\n";
+        return INF;
+    }
+
     while (!reset.empty()) {
-        vis[reset.top()] = 0;
+        cout << "reset " << reset.top() << '\n';
+        vis[dep][reset.top()] = 0;
         reset.pop();
     } 
 
 	coverColumn(edge);
 
     for (int aux = table[0][edge].down; aux != edge; aux = table[0][aux].down) {
+        int tenta = 1;
+        cout << "path = " << table[0][aux].option << '\n';
         for (int node = aux + 1; node != aux;) {
             if (table[0][node].item <= 0) {
                 node = table[0][node].up;
@@ -126,31 +179,33 @@ int search(int rep) {
                 node++;
             }
         }
-        for (int node = aux + 1; node != aux;) {
+        int node = aux;
+        do {
             if (table[0][node].item <= 0) {
                 node = table[0][node].up;
             }
             else {
                 int a = endpoint[table[0][node].item].first;
                 int b = endpoint[table[0][node].item].second;
-                if (!vis[a]) {
-                    int tenta = min(search(a), INF);
-                    ans = min(ans + tenta, INF);
-                    dfs(a, reset);
+                if (!vis[dep][a]) {
+                    tenta = min(tenta + search(dep + 1, a), INF);
+                    dfs(a, dep, reset);
                 }
-                if (!vis[b]) {
-                    int tenta = min(search(b), INF);
-                    ans = min(ans + tenta, INF);
-                    dfs(b, reset);
+                if (!vis[dep][b]) {
+                    tenta = min(tenta + search(dep + 1, b), INF);
+                    dfs(b, dep, reset);
                 }
                 node++;
             }
-        }
+        } while (node != aux);
 
         while (!reset.empty()) {
-            vis[reset.top()] = 0;
+            cout << "reset " << reset.top() << '\n';
+            vis[dep][reset.top()] = 0;
             reset.pop();
         }
+
+        ans = min(ans, tenta);
 
         for (int node = aux - 1; node != aux;) {
             if (table[0][node].item <= 0) {
@@ -164,6 +219,7 @@ int search(int rep) {
     }
 
 	uncoverColumn(edge);
+    cout << "return " << ans << '\n';
     return ans;
 }
 
@@ -268,5 +324,5 @@ int main() {
     table[1][at].up = last;
     table[1][at].down = 0;
 
-    cout << search(1) << '\n';
+    cout << search(0, 1) << '\n';
 }

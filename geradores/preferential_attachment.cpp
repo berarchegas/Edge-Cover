@@ -34,7 +34,7 @@ int main () {
     }
     cout << n << ' ' << e << '\n';
     for (int i = 1; i <= n; i++) {
-        for (int x : graph[i]) if (x > i) cout << i - 1 << ' ' << x - 1 << '\n';
+        for (int x : graph[i]) if (x > i) cout << i << ' ' << x << '\n';
     }
     return 0;
 }

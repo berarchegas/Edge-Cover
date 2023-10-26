@@ -1,18 +1,16 @@
 import os
 
 # Define the main folder containing subfolders with .txt files
-main_folder = os.path.dirname(__file__)
+main_folder = os.path.dirname(__file__) + '/teste/graphs'
+
+k = str(input())
+p = str(input())
 
 # Function to update a graph from 0-based to 1-based
 def update_graph(graph):
-    updated_graph = [graph[0]]
-    for line in graph[1::]:
-        parts = line.strip().split()
-        if len(parts) != 1:
-            updated_line = ' '.join(str(int(part) + 1) for part in parts) + '\n'
-            updated_graph.append(updated_line)
-        else:
-            updated_graph.append(line)
+    updated_graph = [k + '\n', p + '\n']
+    for line in graph:
+        updated_graph.append(line)
     return updated_graph
 
 # Walk through the main folder and its subfolders
