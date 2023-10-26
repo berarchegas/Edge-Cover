@@ -14,12 +14,16 @@ vector<int> v[MAXN];
 set<deque<int>> paths;
 
 int main () { 
+    string s;
+    cin >> s;
+    ofstream outfile(s);
     int n, m, k, p;
     cin >> n >> m >> k >> p;
     vector<pii> edges(m);
     for (int i = 0; i < m; i++) {
         int a, b;
         cin >> a >> b;
+        a--, b--;
         v[a].push_back(b);
         v[b].push_back(a);
         edges[i] = {a, b};
@@ -57,9 +61,14 @@ int main () {
         }
         paths.insert(path);
     }
+    outfile << n << ' ' << m << ' ' << k << '\n';
+    for (int i = 0; i < n; i++) {
+        for (int x : v[i]) if (x > i) outfile << i << ' ' << x << '\n';
+    }
     for (auto x : paths) {
-        for (int y : x) cout << y << ' ';
-        cout << '\n';
+        outfile << x.size() << ' ';
+        for (int y : x) outfile << y << ' ';
+        outfile << '\n';
     }
     return 0;
 }

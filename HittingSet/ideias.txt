@@ -166,3 +166,38 @@ m - #edges + 1?
 options are the paths
 items are the edges
 
+Algoritmo: Manter pra cada vertice uma lista ligada e um vetor que fala pra cada aresta onde ela ta nos vertices e onde ela ta no dancing links
+Manter pra cada componente um representante
+Comecamos o bb no grafo todo, ai fazemos uma dfs que passa pelas arestas da componente e escolhemos qual aresta cobrir
+Agora se nao tivermos percorrido todos os vertices a gnt pega o ultimo caminho escolhido e ve quais vertices nao foram marcados, fazendo dfs neles
+
+Seria legal para a proxima semana terminar de uma vez por todas as instancias
+Organizar um novo repositorio no github com testes automatizados
+Testar a versao inicial contra gurobi e contra o dancing links puro
+
+Dancing Links pros vertices tbm!! (soq invertido)
+Iterar pelo caminho escolhido para achar as novas componentes
+Nessa primeira versao nao vamos implementar nenhuma heuristica nem bound
+O solver vai soh iterar por todas as solucoes para todos os representantes e retornar a melhor combinacao
+
+int search(int rep):
+// devolve o melhor resultado para a componente de rep
+// devolve tudo devidamente rollbackeado
+    se nao tem mais nenhuma aresta pra ser coberta:
+        return 0
+
+    ans = 0
+    dfs no representante e escolhe a aresta com menos caminhos passando por ela
+    cobre essa aresta
+    lembrando que cobrir uma aresta tambem implica esconder ela da table2
+    pra cada caminho que passa por essa aresta:
+        cobre todas as arestas do caminho
+        para cada cara nrep nao visitado (dentre os do caminho escolhido):
+            tenta = min(search(nrep), INF)
+            ans = min(ans + tenta, INF) 
+            faz uma dfs em nrep marcando os visitados
+        reseta os visitados
+        descobre todas as arestas do caminho
+    descobre a aresta escolhida
+    return ans
+        

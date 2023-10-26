@@ -27,8 +27,9 @@ void dfs(int node) {
 }
 
 int main () { 
-    freopen("in.txt", "r", stdin);
-    freopen("out.txt", "w", stdout);
+    string s;
+    cin >> s;
+    ofstream outfile(s);
     int n, m;
     cin >> n >> m;
     for (int i = 0; i < m; i++) {
@@ -41,16 +42,16 @@ int main () {
         vis[i] = 1;
         dfs(i);
     }
-    cout << n << ' ' << m << ' ' << paths.size() << '\n';
+    outfile << n << ' ' << m << ' ' << paths.size() << '\n';
     for (int i = 1; i <= n; i++) {
         for (int x : v[i]) {
-            if (x > i) cout << i << ' ' << x << '\n';
+            if (x > i) outfile << i << ' ' << x << '\n';
         }
     }
     for (auto x : paths) {
-        cout << x.size() << '\n';
-        for (int y : x) cout << y << ' ';
-        cout << '\n';
+        outfile << x.size() << ' ';
+        for (int y : x) outfile << y << ' ';
+        outfile << '\n';
     }
     return 0;
 }

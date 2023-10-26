@@ -6,8 +6,9 @@ const int MAXN = 1e5 + 5;
 
 // we can optimize here
 // only the head nodes need the fields left, right and len
+// hiding a line two times ?
 struct Node {
-	int left, right, up, down, item, len;
+	int left, right, up, down, item, len, option;
 } table[MAXN];
 
 void hideOption(int p) {
@@ -69,13 +70,13 @@ void uncoverItem(int i) {
 }
 
 vector<vector<int>> options;
-int tail[MAXN], solution[MAXN], items, idToOption[MAXN];
+int tail[MAXN], solution[MAXN], items;
 
 void search(int k) {
 
     if (table[0].right == 0) {
         for (int i = 0; i < k; i++) {
-            int id = idToOption[solution[i]];
+            int id = table[solution[i]].option;
             for (int x : options[id]) {
                 cout << x << ' ';
             }
@@ -83,6 +84,7 @@ void search(int k) {
         }
         return;
     }
+    
 
 	// Choose Item Deterministically: Choose the column with the smallest Size
 	int col = table[0].right;
@@ -125,15 +127,28 @@ void search(int k) {
 
 int main() {
 
-    int n;
-    cin >> n;
+    int n, m, p;
+    cin >> n >> m >> p;
 
-    for (int i = 0; i < n; i++) {
-        vector<int> option(3);
-        for (int j = 0; j < 3; j++) {
-            cin >> option[j];
+    vector<vector<int>> ed(n, vector<int> (n));
+    int a, b, cnt = 1;
+    for (int i = 0; i < m; i++) {
+        cin >> a >> b;
+        ed[a][b] = ed[b][a] = cnt++;
+    }
+    for (int i = 0; i < p; i++) {
+        int tam;
+        cin >> tam;
+        vector<int> option(tam - 1);
+        int ini, fim; 
+        cin >> ini;
+        for (int j = 0; j < tam - 1; j++) {
+            cin >> fim;
+            option[j] = ed[ini][fim];
             items = max(items, option[j]);
+            ini = fim;
         }
+        sort(option.begin(), option.end());
         options.push_back(option);
     }
 
@@ -159,7 +174,7 @@ int main() {
             table[options[i][j]].up = at;
             table[tail[options[i][j]]].down = at;
             tail[options[i][j]] = at;
-            idToOption[at] = i;
+            table[at].option = i;
             at++;
         }
     }
