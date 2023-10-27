@@ -70,18 +70,12 @@ void uncoverItem(int i) {
 }
 
 vector<vector<int>> options;
-int tail[MAXN], solution[MAXN], items;
+int tail[MAXN], solution[MAXN], items, ans = 1e9;
 
 void search(int k) {
 
     if (table[0].right == 0) {
-        for (int i = 0; i < k; i++) {
-            int id = table[solution[i]].option;
-            for (int x : options[id]) {
-                cout << x << ' ';
-            }
-            cout << ",\n"[i == k - 1];
-        }
+        ans = min(ans, k);
         return;
     }
     
@@ -186,4 +180,5 @@ int main() {
     table[at].up = last;
     table[at].down = 0;
     search(0);
+    cout << ans << '\n';
 }

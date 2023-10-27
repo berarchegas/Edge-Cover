@@ -27,6 +27,7 @@ void dfs(int node) {
 }
 
 int main () { 
+    freopen("in.txt", "w", stdout);
     int n, m;
     cin >> n >> m;
     for (int i = 0; i < m; i++) {
