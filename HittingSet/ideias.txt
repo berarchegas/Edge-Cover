@@ -180,8 +180,6 @@ Iterar pelo caminho escolhido para achar as novas componentes
 Nessa primeira versao nao vamos implementar nenhuma heuristica nem bound
 O solver vai soh iterar por todas as solucoes para todos os representantes e retornar a melhor combinacao
 
-precisamos pensar em uma forma de manter o vetor de visitados, pq eu to fodendo isso kkkkkkkkkk
-
 
 int search(int rep):
 // devolve o melhor resultado para a componente de rep
@@ -203,4 +201,17 @@ int search(int rep):
         descobre todas as arestas do caminho
     descobre a aresta escolhida
     return ans
+
+Otimizacoes:
+    Fazer o search nas componentes por ordem de tamanho
+    Manter os bounds pra cada componente (como fazer isso ?)
+    Talvez manter o upperbound global e calcular de todas as componentes com uma stack ao inves de recursao
+    Problema: Nosso algoritmo eh rapido, mas ele acha todas as respostas e a gnt n quer isso
+
+Ideia: Tem um overcounting baseado no conjunto de arestas, podemos fazer um hashing para checar se ja chegamos em cada posicao
+Nao sei como retornar dai 
+
+Pode ter mais de uma componente no comeco, temos que ver isso
+
+Por algum motivo o main.cpp ta errado e o new.cpp nao???????????????????????????????????????????????????
         

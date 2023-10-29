@@ -187,17 +187,17 @@ int search(int dep, int rep) {
             else {
                 int a = endpoint[table[0][node].item].first;
                 int b = endpoint[table[0][node].item].second;
-                if (!vis[dep][a]) {
+                if (!vis[dep][a] && tenta < INF) {
                     tenta = min(tenta + search(dep + 1, a), INF);
                     dfs(a, dep, reset);
                 }
-                if (!vis[dep][b]) {
+                if (!vis[dep][b] && tenta < INF) {
                     tenta = min(tenta + search(dep + 1, b), INF);
                     dfs(b, dep, reset);
                 }
                 node++;
             }
-        } while (node != aux);
+        } while (node != aux && tenta < INF);
 
         while (!reset.empty()) {
             // cout << "reset " << reset.top() << '\n';

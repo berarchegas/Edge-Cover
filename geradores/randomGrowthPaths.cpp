@@ -34,7 +34,7 @@ int main () {
         inPath.insert(end);
         while (true) {
             int prob = rng() % 101;
-            if (prob < p || path.size() < 4) {
+            if (prob > p || path.size() < 4) {
                 vector<pii> candidates;
                 for (int x : v[start]) {
                     if (!inPath.count(x)) candidates.push_back({x, 0});

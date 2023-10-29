@@ -51,7 +51,7 @@ int main () {
         while (true) {
             int a = rng() % n + 1;
             int b = rng() % n + 1;
-            if (st.count({a, b})) continue;
+            if (st.count({a, b}) || a == b) continue;
             v[a].push_back(b);
             v[b].push_back(a);
             st.insert({a, b});
@@ -61,7 +61,7 @@ int main () {
     }
 	cout << n << ' ' << m << '\n';
     for (int i = 1; i <= n; i++) {
-        for (int x : v[i]) if (x > i) cout << i - 1 << ' ' << x - 1 << '\n';
+        for (int x : v[i]) if (x > i) cout << i << ' ' << x << '\n';
     }
     return 0;
 }

@@ -7,6 +7,9 @@ main_folder = os.path.join(os.path.dirname(__file__), 'teste', 'graphs')
 # Define the path to your C++ executable
 cpp_executable = os.path.join(os.path.dirname(__file__), 'geradores', 'randomGrowthPaths.exe')
 
+k = input()
+p = input()
+
 # Function to generate paths of size 3 and save them to an output file
 def generate_paths(input_graph_file, output_path, file_name):
     output_file = os.path.join(output_path, file_name)
@@ -27,6 +30,6 @@ for root, dirs, files in os.walk(main_folder):
                 os.makedirs(output_directory)
 
             # Process the graph file and generate paths
-            generate_paths(input_graph_path, output_directory, file_name[:-4] + "_1_50.txt")
+            generate_paths(input_graph_path, output_directory, file_name[:-4] + f"_{k}_{p}.txt")
 
 print("Processing complete.")

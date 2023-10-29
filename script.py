@@ -9,7 +9,7 @@ p = str(input())
 # Function to update a graph from 0-based to 1-based
 def update_graph(graph):
     updated_graph = [k + '\n', p + '\n']
-    for line in graph:
+    for line in graph[2::]:
         updated_graph.append(line)
     return updated_graph
 
