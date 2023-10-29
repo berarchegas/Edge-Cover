@@ -4,6 +4,12 @@ using namespace std;
 
 const int MAXN = 1e5 + 5;
 
+// temos que codar um transformador de input de grafo/caminhos para matriz de exact cover
+// Good results were obtained
+// by choosing an i with the fewest not-too-costly options, as in the MRV heuristic.
+// In case of ties, the author’s implementation chose an i whose least expensive
+// option cost the most.
+
 // we can optimize here
 // only the head nodes need the fields left, right and len
 // hiding a line two times ?
@@ -11,8 +17,13 @@ struct Node {
 	int left, right, up, down, item, len, option;
 } table[MAXN];
 
+vector<vector<int>> options;
+int tail[MAXN], solution[MAXN], items, idToOption[MAXN];
+
 void hideOption(int p) {
     // hide option p
+
+    cout << "Hide " << idToOption[p] << endl;
 
     int q = p + 1;
     while (q != p) {
@@ -31,6 +42,8 @@ void hideOption(int p) {
 void unhideOption(int p) {
     // unhide option p
 
+    cout << "Unhide " << idToOption[p] << endl;
+
     int q = p - 1;
     while (q != p) {
         if (table[q].item <= 0) {
@@ -48,6 +61,8 @@ void unhideOption(int p) {
 void coverItem(int i) {
     // cover item i
 
+    // cout << "Cover " << i << endl;
+
     int p = table[i].down;
     while (p != i) {
         hideOption(p);
@@ -60,6 +75,8 @@ void coverItem(int i) {
 void uncoverItem(int i) {
     // uncover item i
 
+    // cout << "Uncover " << i << endl;
+
     table[table[i].left].right = i;
     table[table[i].right].left = i;
     int p = table[i].up;
@@ -69,6 +86,7 @@ void uncoverItem(int i) {
     }
 }
 
+<<<<<<< HEAD
 vector<vector<int>> options;
 int tail[MAXN], solution[MAXN], items, ans = 1e9;
 
@@ -76,6 +94,18 @@ void search(int k) {
 
     if (table[0].right == 0) {
         ans = min(ans, k);
+=======
+void search(int k) {
+
+    if (table[0].right == 0) {
+        for (int i = 0; i < k; i++) {
+            int id = idToOption[solution[i]];
+            for (int j = 0; j < (int)options[id].size(); j++) {
+                cout << options[id][j] << " ,"[j == (int)options[id].size() - 1 && i < k - 1];
+            }
+            cout << " \n"[i == k - 1];
+        }
+>>>>>>> 9ad3ad8 (Testes)
         return;
     }
     
@@ -124,6 +154,7 @@ int main() {
     int n, m, p;
     cin >> n >> m >> p;
 
+<<<<<<< HEAD
     vector<vector<int>> ed(n, vector<int> (n));
     int a, b, cnt = 1;
     for (int i = 0; i < m; i++) {
@@ -142,6 +173,14 @@ int main() {
             cin >> fim;
             fim--;
             option[j] = ed[ini][fim];
+=======
+    for (int i = 0; i < n; i++) {
+        int tam;
+        tam = 3;
+        vector<int> option(tam);
+        for (int j = 0; j < tam; j++) {
+            cin >> option[j];
+>>>>>>> 9ad3ad8 (Testes)
             items = max(items, option[j]);
             ini = fim;
         }
@@ -158,6 +197,7 @@ int main() {
     }
     int at = items + 1, last = 0;
     for (int i = 0; i < (int)options.size(); i++) {
+
         // add a spacer node
         table[at].item = -i;
         table[at].up = last;
@@ -175,6 +215,7 @@ int main() {
             at++;
         }
     }
+
     // last spacer node
     table[at].item = - (int)options.size();
     table[at].up = last;

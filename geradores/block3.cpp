@@ -60,6 +60,7 @@ int main () {
     for (int i = 0; i < elements[0].size(); i++) {
         triplets.push_back({elements[0][i], elements[1][i], elements[2][i]});
     }
+    cout << triplets.size() << '\n';
     for (auto x : triplets) cout << x[0] << ' ' << x[1] << ' ' << x[2] << '\n';
     return 0;
 }
